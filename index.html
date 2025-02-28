@@ -3,7 +3,7 @@
     <head>
         <!-- set view point and character -->
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
         
         <!-- set page and description -->
         <title>London Emergency Response Network</title>
@@ -13,27 +13,31 @@
         <meta name="keywords" content="London, emergency response, ambulance, fire department, police, real-time, interactive map">
         <meta name="author" content="Shiyu Cheng, CASA003">
         
-        <!-- Open Graph (社交媒体分享优化) -->
+        <!-- Open Graph -->
         <meta property="og:title" content="London Emergency Response Network">
         <meta property="og:description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
         <meta property="og:image" content="https://yourwebsite.com/preview-image.jpg"> <!--待修改-->
         <meta property="og:url" content=" https://meimao76.github.io/LFBtimemap/">
         <meta property="og:type" content="website">
         
-        <!-- Twitter Card (推特分享优化) -->
+        <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="London Emergency Response Network">
         <meta name="twitter:description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
         <meta name="twitter:image" content="https://yourwebsite.com/preview-image.jpg"> <!--待修改-->
     
-        <!-- 地图和交互式可视化相关库 -->
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  <!-- Leaflet.js -->
+        <!-- leaflet, chart, D3, mapbox -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  <!-- Leaflet -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart.js -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3.js -->
-    
-        <!-- 自定义 CSS & JS -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
+
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+
+
+        <!-- CSS & JS -->
         <link rel="stylesheet" href="styles.css">
         <script defer src="script.js"></script>
     
@@ -43,5 +47,62 @@
     
 <body>
     
+    <div id="map"></div>
+
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <h2>London Fire Response Times</h2>
+            <table>
+                <tr>
+                    <td>
+                        <input id="slider" type="range" min="0" max="11" step="1" value="0" list="tickmarks" />
+                        <datalist id="tickmarks">
+                            <option value="0" label="Jan 2024">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                            <option value="4">
+                            <option value="5" label="Jun 2024">
+                            <option value="6">
+                            <option value="7">
+                            <option value="8">
+                            <option value="9">
+                            <option value="10">
+                            <option value="11" label="Dec 2024">
+                        </datalist>
+                    </td>
+                    <td>
+                        <label id="month-label">Jan 2024</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById("slider").addEventListener("input", function () {
+            const monthLabels = [
+                "Jan 2024", "Feb 2024", "Mar 2024", "Apr 2024", 
+                "May 2024", "Jun 2024", "Jul 2024", "Aug 2024", 
+                "Sep 2024", "Oct 2024", "Nov 2024", "Dec 2024"
+            ];
+        
+            let currentValue = this.value;
+
+            document.getElementById("month-label").textContent = monthLabels[currentValue];
+        });
+    </script>
+    <script>
+    mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw'; // 确保这个 Token 是有效的
+
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11', 
+        center: [-0.1, 51.5], 
+        zoom: 12
+    });
+    </script>
+
+        
 </body>
 </html>
