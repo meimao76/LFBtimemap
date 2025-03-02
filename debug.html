@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- set view point and character -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        
+        <!-- set page and description -->
+        <title>London Emergency Response Network</title>
+        <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
+        
+        <!-- Open Graph -->
+        <meta property="og:title" content="London Emergency Response Network">
+        <meta property="og:description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
+        <meta property="og:image" content="https://yourwebsite.com/preview-image.jpg"> <!--待修改-->
+        <meta property="og:url" content=" https://meimao76.github.io/LFBtimemap/">
+        <meta property="og:type" content="website">
+    
+        <!-- chart, D3, mapbox -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
+
+        <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+        <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+
+        <!-- CSS & JS -->
+        <link rel="stylesheet" href="styles.css">
+        <script defer src="script.js"></script>
+    
+        <!-- website icon -->
+        <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
+    </head>
+    
+<body>
+    
+    <div id="map"></div>
+
+    <div class="map-overlay top">
+        <div class="map-overlay-inner">
+            <h2>London Fire Response Times</h2>
+            <table>
+                <tr>
+                    <td>
+                        <input id="slider" type="range" min="0" max="11" step="1" value="0" list="tickmarks" />
+                        <datalist id="tickmarks">
+                            <option value="0" label="01">
+                            <option value="1">
+                            <option value="2">
+                            <option value="3">
+                            <option value="4">
+                            <option value="5" label="06">
+                            <option value="6">
+                            <option value="7">
+                            <option value="8">
+                            <option value="9">
+                            <option value="10">
+                            <option value="11" label="12">
+                        </datalist>
+                    </td>
+                    <td>
+                        <label id="month-label">2024-01</label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw'; 
+        
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11', 
+            center: [-0.1, 51.5], 
+            zoom: 12
+        });
+
+//adding fire station data
+    
+        const tooltip = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+    });
+
+    d3.csv('firestation.csv').then(data => {
+    data.forEach(d => {
+        const marker = new mapboxgl.Marker({ color: 'red' , scale: 0.5 })
+            .setLngLat([+d.longitude, +d.latitude])
+            .addTo(map);
+
+        marker.getElement().addEventListener('mouseenter', () => {
+            tooltip.setLngLat([+d.longitude, +d.latitude])
+                .setHTML(`<strong>${d.name}</strong>`)
+                .addTo(map);
+        });
+
+        marker.getElement().addEventListener('mouseleave', () => {
+            tooltip.remove();
+            });
+        });
+    });
+        
+
+let geojsonData = null;  // 存储 `GeoJSON` 数据，确保 updateMap() 可以使用
+
+map.on('load', function () {
+    fetch('boroughs_merged.geojson')
+        .then(response => response.json())
+        .then(geojson => {
+            geojsonData = geojson; // 存储数据，后续滑动条可以用
+            map.addSource('boroughs', { 'type': 'geojson', 'data': geojson });
+
+            map.addLayer({
+                'id': 'boroughs-layer',
+                'type': 'fill',
+                'source': 'boroughs',
+                'paint': {
+                    'fill-color': [
+                        'case',
+                        ['has', '01', ['get', 'response_times']], 
+                        ['interpolate', ['linear'],
+                            ['get', '01', ['get', 'response_times']], 
+                            0, '#ffffb2',
+                            600, '#bd0026'
+                        ], 
+                        '#888888'
+                    ],
+                    'fill-opacity': 0.6
+                }
+            });
+        })
+        .catch(error => console.error("Error loading borough data:", error));
+});
+
+// **🔹 修正 updateMap()，确保滑块变动时数据正确更新**
+function updateMap(month) {
+    if (!map.getLayer('boroughs-layer') || !geojsonData) {
+        console.warn("Map layer or data not ready yet!");
+        return;
+    }
+
+    console.log("Updating map for:", month);  // 调试信息
+
+    map.setPaintProperty('boroughs-layer', 'fill-color', [
+        'case',
+        ['has', month, ['get', 'response_times']], 
+        ['interpolate', ['linear'],
+            ['get', month, ['get', 'response_times']], 
+            200, '#ffffb2',
+            400, '#bd0026'
+        ], 
+        '#888888'
+    ]);
+}
+
+// **🔹 监听滑动条的值变化**
+document.getElementById('slider').addEventListener('input', function (e) {
+    const selectedIndex = e.target.value;
+    const months = [
+        "01", "02", "03", "04", "05", "06",
+        "07", "08", "09", "10", "11", "12"
+    ];
+    const selectedMonth = months[selectedIndex];
+    document.getElementById('month-label').innerText = selectedMonth;
+    updateMap(selectedMonth);
+});
+
+        </script>
+        
+        
+</body>
+</html>
+
