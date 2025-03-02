@@ -2,6 +2,12 @@
 body { margin:0; padding:0; }
      #map { position:absolute; top:0; bottom:0; left: 0; width:100%; }
 
+    
+ .mapboxgl-marker {
+    cursor: default;
+}
+    
+
 .map-overlay {
     font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     position: absolute;

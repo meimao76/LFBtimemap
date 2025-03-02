@@ -9,22 +9,12 @@
         <title>London Emergency Response Network</title>
         <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
         
-        <!-- set SEO -->
-        <meta name="keywords" content="London, emergency response, ambulance, fire department, police, real-time, interactive map">
-        <meta name="author" content="Shiyu Cheng, CASA003">
-        
         <!-- Open Graph -->
         <meta property="og:title" content="London Emergency Response Network">
         <meta property="og:description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
         <meta property="og:image" content="https://yourwebsite.com/preview-image.jpg"> <!--待修改-->
         <meta property="og:url" content=" https://meimao76.github.io/LFBtimemap/">
         <meta property="og:type" content="website">
-        
-        <!-- Twitter Card -->
-        <meta name="twitter:card" content="summary_large_image">
-        <meta name="twitter:title" content="London Emergency Response Network">
-        <meta name="twitter:description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
-        <meta name="twitter:image" content="https://yourwebsite.com/preview-image.jpg"> <!--待修改-->
     
         <!-- leaflet, chart, D3, mapbox -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>  <!-- Leaflet -->
@@ -35,7 +25,6 @@
 
         <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
         <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
-
 
         <!-- CSS & JS -->
         <link rel="stylesheet" href="styles.css">
@@ -92,6 +81,8 @@
             document.getElementById("month-label").textContent = monthLabels[currentValue];
         });
     </script>
+
+    <!-- adding mapbox -->
     <script>
     mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw'; // 确保这个 Token 是有效的
 
@@ -101,6 +92,33 @@
         center: [-0.1, 51.5], 
         zoom: 12
     });
+    </script>
+
+<!--adding data-->
+    <script>
+        const tooltip = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+});
+
+d3.csv('firestation.csv').then(data => {
+    data.forEach(d => {
+        const marker = new mapboxgl.Marker({ color: 'red' , scale: 0.5 })
+            .setLngLat([+d.longitude, +d.latitude])
+            .addTo(map);
+
+        marker.getElement().addEventListener('mouseenter', () => {
+            tooltip.setLngLat([+d.longitude, +d.latitude])
+                .setHTML(`<strong>${d.name}</strong>`)
+                .addTo(map);
+        });
+
+        marker.getElement().addEventListener('mouseleave', () => {
+            tooltip.remove();
+        });
+    });
+});
+
     </script>
 
         
