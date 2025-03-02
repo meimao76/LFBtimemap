@@ -32,7 +32,8 @@
     </head>
     
 <body>
-    
+    <!--container -->
+
     <div id="map"></div>
 
     <div class="map-overlay top">
@@ -58,33 +59,43 @@
                         </datalist>
                     </td>
                     <td>
-                        <label id="month-label">01</label>
+                        <label id="month-label">24-01</label>
                     </td>
                 </tr>
             </table>
         </div>
+
+        <div id="borough-info" class="borough-info-panel">
+            <h2>Borough Information</h2>
+            <p><strong>Name:</strong> <span id="Borough Name">-</span></p>
+            <p><strong>Average Response Time:</strong> <span id="Average Response Time">-</span></p>
+        </div>
     </div>
+
+    
+    
     
     <script>
+// basic map
         mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw'; 
         
         var map = new mapboxgl.Map({
             container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11', 
+            style: 'mapbox://styles/mapbox/light-v11', 
             center: [-0.1, 51.5], 
             zoom: 12
         });
 
 //adding fire station data
     
-        const tooltip = new mapboxgl.Popup({
+    const tooltip = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
     });
 
     d3.csv('firestation.csv').then(data => {
     data.forEach(d => {
-        const marker = new mapboxgl.Marker({ color: 'red' , scale: 0.5 })
+        const marker = new mapboxgl.Marker({ color: '#4a010a' , scale: 0.5 })
             .setLngLat([+d.longitude, +d.latitude])
             .addTo(map);
 
@@ -99,73 +110,170 @@
             });
         });
     });
-        
 
-let geojsonData = null;  // 存储 `GeoJSON` 数据，确保 updateMap() 可以使用
+    let geojsonData = null;  // save GeoJSON 
+    let selectedMonth = "24-01"; 
+    let hoveredBoroughId = null;
+    
 
-map.on('load', function () {
+    map.on('load', function () {
     fetch('boroughs_merged.geojson')
         .then(response => response.json())
         .then(geojson => {
-            geojsonData = geojson; // 存储数据，后续滑动条可以用
+            geojsonData = geojson; // geojson
+            geojson.features.forEach((feature, index) => {
+                feature.id = index;
+            });
             map.addSource('boroughs', { 'type': 'geojson', 'data': geojson });
 
+            // 1. borough boundaries
+            map.addLayer({
+                'id': 'boroughs-outline',
+                'type': 'line',
+                'source': 'boroughs',
+                'paint': {
+                    'line-color': '#FFFFFF',  // white
+                    'line-opacity':0.6,
+                    'line-width': [
+                        'case',
+                        ['boolean',['feature-state','hover'],false],5,
+                        1
+                    ]
+                }
+            });
+
+            // 2. borough fill color
             map.addLayer({
                 'id': 'boroughs-layer',
                 'type': 'fill',
                 'source': 'boroughs',
                 'paint': {
-                    'fill-color': [
-                        'case',
-                        ['has', '01', ['get', 'response_times']], 
-                        ['interpolate', ['linear'],
-                            ['get', '01', ['get', 'response_times']], 
-                            0, '#ffffb2',
-                            600, '#bd0026'
-                        ], 
-                        '#888888'
-                    ],
-                    'fill-opacity': 0.6
+                    'fill-color': '#FFFFFF', 
+                    'fill-opacity': 0.2 
                 }
+            });
+
+            // 3. emphasizing the borough
+            map.addLayer({
+                'id': 'boroughs-extrusion',
+                'type': 'fill-extrusion',
+                'source': 'boroughs',
+                'paint': {
+                    'fill-extrusion-color': '#FFFFFF',
+                    'fill-extrusion-opacity': 0.5,
+                    'fill-extrusion-height': [
+                        'case',
+                        ['boolean', ['feature-state', 'hover'], false], 1000, // hovering height
+                        0  // normal height 0
+                    ]
+                }
+            });
+            
+            map.moveLayer('boroughs-outline');
+            updateMap("24-01");
+
+            // 4. showing the information when hovering over boroughs
+            map.on('mousemove', 'boroughs-layer', function (e) {
+
+                let feature = e.features[0];
+                
+                if (hoveredBoroughId !== null) {
+                    map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: false });
+                }
+
+                hoveredBoroughId = feature.id;
+                map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: true });
+                
+                let boroughName = feature.properties.NAME; // read Borough name
+                let responseTimes; // read response time
+                try {
+                    responseTimes = JSON.parse(feature.properties.response_times);
+                    } catch (error) {
+                    console.error("read response_times failed:", error);
+                    responseTimes = {}; 
+                    }
+
+                    // read raw times
+                    let rawTime = responseTimes[selectedMonth];
+
+                    // round times
+                    let responseTimeDisplay;
+                    if (typeof rawTime === 'number') {
+                        responseTimeDisplay = rawTime.toFixed(2) + " sec"; 
+                        } else if (typeof rawTime === 'string') {
+                        const parsedNumber = parseFloat(rawTime);
+                        responseTimeDisplay = !isNaN(parsedNumber) ? parsedNumber.toFixed(2) + " sec" : "unvalid data";
+                        } else {
+                        responseTimeDisplay = "unvalid data"; // undefined/null
+                        }
+                
+
+                        document.getElementById('Borough Name').textContent = boroughName;
+                        document.getElementById('Average Response Time').textContent = responseTimeDisplay;
+            });
+
+            // 5. remove the information
+            map.on('mouseleave', 'boroughs-layer', function () {
+                document.getElementById('Borough Name').textContent = "-";
+                document.getElementById('Average Response Time').textContent = "-";
             });
         })
         .catch(error => console.error("Error loading borough data:", error));
 });
 
-// **🔹 修正 updateMap()，确保滑块变动时数据正确更新**
+// 6. update the color with data
 function updateMap(month) {
     if (!map.getLayer('boroughs-layer') || !geojsonData) {
         console.warn("Map layer or data not ready yet!");
         return;
     }
 
-    console.log("Updating map for:", month);  // 调试信息
+    selectedMonth = month; // choosing months
 
     map.setPaintProperty('boroughs-layer', 'fill-color', [
         'case',
-        ['has', month, ['get', 'response_times']], 
+        ['has', ['to-string', month], ['get', 'response_times']], 
         ['interpolate', ['linear'],
-            ['get', month, ['get', 'response_times']], 
-            200, '#ffffb2',
-            400, '#bd0026'
+            ['get', ['to-string', month], ['get', 'response_times']], 
+            240, '#f3e6db', // light yellow
+            400, '#c52222'  // pink red
         ], 
         '#888888'
     ]);
+
+    if (map.getLayer('boroughs-extrusion')) {
+        map.setPaintProperty('boroughs-extrusion', 'fill-extrusion-color', [
+            'case',
+            ['has', ['to-string', month], ['get', 'response_times']], 
+            ['interpolate', ['linear'],
+                ['get', ['to-string', month], ['get', 'response_times']], 
+                240, '#f3e6db',
+                400, '#c52222'
+            ], 
+            '#888888' // gray with no data
+        ]);
+    }
+
+    // slid to change the layer
+    map.setPaintProperty('boroughs-layer', 'fill-opacity', 0.6);
 }
 
-// **🔹 监听滑动条的值变化**
+// 7. listen for slider and update the map
 document.getElementById('slider').addEventListener('input', function (e) {
-    const selectedIndex = e.target.value;
+    const selectedIndex = parseInt(e.target.value, 10);  // set the key
     const months = [
-        "01", "02", "03", "04", "05", "06",
-        "07", "08", "09", "10", "11", "12"
+        "24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+        "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"
     ];
-    const selectedMonth = months[selectedIndex];
-    document.getElementById('month-label').innerText = selectedMonth;
-    updateMap(selectedMonth);
+    
+    if (selectedIndex >= 0 && selectedIndex < months.length) {
+        const selectedMonth = months[selectedIndex];
+        document.getElementById('month-label').innerText = selectedMonth;
+        updateMap(selectedMonth);
+    }
 });
 
-        </script>
+    </script>
         
         
 </body>
