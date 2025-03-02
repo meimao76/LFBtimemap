@@ -3,13 +3,13 @@ body { margin:0; padding:0; }
      #map { position:absolute; top:0; bottom:0; left: 0; width:100%; }
 
 .map-overlay {
-    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
     position: absolute;
-    width: 380px;
-    min-width: 380px;
+    width: 360px;
+    min-width: 360px;
     top: 0;
     left: 0;
-    padding: 10px;
+    padding: 16px;
 }
 
 .map-overlay .map-overlay-inner {
@@ -19,4 +19,14 @@ body { margin:0; padding:0; }
     padding: 10px;
     margin-bottom: 10px;
 }
+
+input[type="range"] {
+    width: 250px; 
+    height: 10px; 
+    border-radius: 5px; 
+    outline: none;
+    opacity: 1;
+    transition: opacity .15s ease-in-out;
+}
+
 </style>
