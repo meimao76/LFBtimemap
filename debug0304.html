@@ -77,8 +77,6 @@
         <p><strong>Name:</strong> <span id="Borough Name">-</span></p>
         <p><strong>Average Response Time:</strong> <span id="Average Response Time">-</span></p>
     </div>
-    <!-- 5.3 chart -->
-
 </div>
 
 
@@ -146,6 +144,7 @@ d3.csv('firestation.csv').then(data => {
 });
 
 // 3. adding boroughs and average responsetime data
+
 let geojsonData = null; 
 let selectedMonth = "24-01"; 
 let hoveredBoroughId = null;
@@ -297,11 +296,11 @@ function updateMap(month) {
 
 // 3.7. listen for slider and update the map
 document.getElementById('slider').addEventListener('input', function (e) {
-    const selectedIndex = parseInt(e.target.value, 10);  // set the key
-    const months = [
+const selectedIndex = parseInt(e.target.value, 10);  // set the key
+const months = [
         "24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
         "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"
-    ];
+];
     
     if (selectedIndex >= 0 && selectedIndex < months.length) {
         const selectedMonth = months[selectedIndex];
