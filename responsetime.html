@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- set view point and character -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        
+    <!-- set page and description -->
+    <title>2024 London Emergency Response Network</title>
+    <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
+    
+    <!-- chart, D3, mapbox -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+
+    <!-- CSS & JS -->
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    
+    <!-- website icon -->
+    <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
+</head>
+    
+<body>    
+<!-- 3.mian content(not display at first) -->
+<div id="main-content" style="display: none;"></div>
+<!-- 4.map container-->
+<div id="map"></div>
+<!-- 5.information on top of map-->
+<div class="map-overlay top">
+    <!-- 5.1 slider -->
+    <div class="map-overlay-inner">
+        <h2>2024 London Fire Response Times</h2>
+        <table>
+            <tr>
+                <td>
+                    <input id="slider" type="range" min="0" max="11" step="1" value="0" list="tickmarks" />
+                    <datalist id="tickmarks">
+                        <option value="0" label="01">
+                        <option value="1">
+                        <option value="2">
+                        <option value="3">
+                        <option value="4">
+                        <option value="5" label="06">
+                        <option value="6">
+                        <option value="7">
+                        <option value="8">
+                        <option value="9">
+                        <option value="10">
+                        <option value="11" label="12">
+                    </datalist>
+                </td>
+                <td>
+                    <label id="month-label">24-01</label>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- 5.2 basic info -->
+    <div id="borough-info" class="borough-info-panel">
+        <h2>Borough Information</h2>
+        <p><strong>Name:</strong> <span id="Borough Name">-</span></p>
+        <p><strong>Average Response Time:</strong> <span id="Average Response Time">-</span></p>
+    </div>
+    <!-- 5.3 chart -->
+    <div id="linechart" class="chart-container">
+        <canvas id="boroughLineChart"></canvas>
+    </div>
+    
+</div>
+
+    
+<script>
+// 1. basic map
+mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v10', 
+    center: [-0.1, 51.5], 
+    zoom: 12
+});
+
+// 2. adding fire station points
+const tooltip = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+});
+
+d3.csv('firestation.csv').then(data => {
+    data.forEach(d => {
+        const marker = new mapboxgl.Marker({ color: '#4a010a' , scale: 0.5 })
+            .setLngLat([+d.Longitude, +d.Latitude])
+            .addTo(map);
+
+        marker.getElement().addEventListener('mouseenter', () => {
+            tooltip.setLngLat([+d.Longitude, +d.Latitude])
+                .setHTML(`<strong>${d.name}</strong>`)
+                .addTo(map);
+        });
+
+        marker.getElement().addEventListener('mouseleave', () => {
+            tooltip.remove();
+        });
+    });
+});
+
+// 3. adding boroughs and average responsetime data
+let geojsonData = null; 
+let selectedMonth = "24-01"; 
+let hoveredBoroughId = null;
+    
+map.on('load', function () {
+    fetch('boroughs_merged.geojson')
+    .then(response => response.json())
+    .then(geojson => {
+        geojsonData = geojson; // geojson
+        geojson.features.forEach((feature, index) => {
+            feature.id = index;
+        });
+        map.addSource('boroughs', { 'type': 'geojson', 'data': geojson });
+
+        // 3.1. borough boundaries
+        map.addLayer({
+            'id': 'boroughs-outline',
+            'type': 'line',
+            'source': 'boroughs',
+            'paint': {
+                'line-color': '#FFFFFF',  // white
+                'line-opacity':0.6,
+                'line-width': [
+                    'case',
+                    ['boolean',['feature-state','hover'],false],5,
+                    1
+                ]
+            }
+        });
+
+        // 3.2. borough fill color
+        map.addLayer({
+            'id': 'boroughs-layer',
+            'type': 'fill',
+            'source': 'boroughs',
+            'paint': {
+                'fill-color': '#FFFFFF', 
+                'fill-opacity': 0.2 
+            }
+        });
+
+        // 3.3. emphasizing the borough
+        map.addLayer({
+            'id': 'boroughs-extrusion',
+            'type': 'fill-extrusion',
+            'source': 'boroughs',
+            'paint': {
+                'fill-extrusion-color': '#FFFFFF',
+                'fill-extrusion-opacity': 0.5,
+                'fill-extrusion-height': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 1000, // hovering height
+                    0  // normal height 0
+                ]
+            }
+        });
+            
+        map.moveLayer('boroughs-outline'); // make sure the boundary is always on top
+        updateMap("24-01"); // update the map color
+
+        // 3.4. showing the information when hovering over boroughs
+        map.on('mousemove', 'boroughs-layer', function (e) {
+            map.getCanvas().style.cursor = 'default';
+
+            let feature = e.features[0];
+                
+            if (hoveredBoroughId !== null) {
+                map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: false });
+            }
+
+            hoveredBoroughId = feature.id;
+            map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: true });
+                
+            let boroughName = feature.properties.NAME; // read Borough name
+            let responseTimes; // read response time
+            try {
+                responseTimes = JSON.parse(feature.properties.response_times);
+            } catch (error) {
+                console.error("read response_times failed:", error);
+                responseTimes = {}; 
+            }
+
+            // read raw times
+            let rawTime = responseTimes[selectedMonth];
+
+            // round times
+            let responseTimeDisplay;
+            if (typeof rawTime === 'number') {
+                responseTimeDisplay = rawTime.toFixed(2) + " sec"; 
+                } else if (typeof rawTime === 'string') {
+                    const parsedNumber = parseFloat(rawTime);
+                    responseTimeDisplay = !isNaN(parsedNumber) ? parsedNumber.toFixed(2) + " sec" : "unvalid data";
+                } else {
+                    responseTimeDisplay = "unvalid data"; // undefined/null
+                }
+                
+
+            document.getElementById('Borough Name').textContent = boroughName;
+            document.getElementById('Average Response Time').textContent = responseTimeDisplay;
+        });
+
+            
+
+        // 3.5. remove the information
+        map.on('mouseleave', 'boroughs-layer', function () {
+            document.getElementById('Borough Name').textContent = "-";
+            document.getElementById('Average Response Time').textContent = "-";
+        });
+    })
+    .catch(error => console.error("Error loading borough data:", error));
+});
+
+// 3.6. update the color with data
+function updateMap(month) {
+    if (!map.getLayer('boroughs-layer') || !geojsonData) {
+        console.warn("Map layer or data not ready yet!");
+        return;
+    }
+
+    selectedMonth = month; // choosing months
+
+    map.setPaintProperty('boroughs-layer', 'fill-color', [
+        'case',
+        ['has', ['to-string', month], ['get', 'response_times']], 
+        ['interpolate', ['linear'],
+            ['get', ['to-string', month], ['get', 'response_times']], 
+            240, '#f3e6db', // light yellow
+            400, '#c52222'  // pink red
+        ], 
+        '#888888'
+    ]);
+
+    if (map.getLayer('boroughs-extrusion')) {
+        map.setPaintProperty('boroughs-extrusion', 'fill-extrusion-color', [
+            'case',
+            ['has', ['to-string', month], ['get', 'response_times']], 
+            ['interpolate', ['linear'],
+                ['get', ['to-string', month], ['get', 'response_times']], 
+                240, '#f3e6db',
+                400, '#c52222'
+            ], 
+            '#888888' // gray with no data
+        ]);
+    }
+
+    // slid to change the layer
+    map.setPaintProperty('boroughs-layer', 'fill-opacity', 0.6);
+}
+
+// 3.7. listen for slider and update the map
+document.getElementById('slider').addEventListener('input', function (e) {
+    const selectedIndex = parseInt(e.target.value, 10);  // set the key
+    const months = [
+        "24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+        "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"
+    ];
+    
+    if (selectedIndex >= 0 && selectedIndex < months.length) {
+        const selectedMonth = months[selectedIndex];
+        document.getElementById('month-label').innerText = selectedMonth;
+        updateMap(selectedMonth);
+    }
+});
+
+let boroughLineChart; // 存储图表实例
+
+// 创建折线图
+function updateLineChart(boroughName) {
+    if (!geojsonData) {
+        console.warn("GeoJSON 数据未加载！");
+        return;
+    }
+
+    // 找到当前 Borough 数据
+    let boroughFeature = geojsonData.features.find(f => f.properties.NAME === boroughName);
+    if (!boroughFeature) {
+        console.warn(`未找到 Borough: ${boroughName}`);
+        return;
+    }
+
+    // 解析 `response_times` 数据
+    let responseTimes; // read response time
+            try {
+                responseTimes = JSON.parse(feature.properties.response_times);
+            } catch (error) {
+                console.error("read response_times failed:", error);
+                responseTimes = {}; 
+            }
+
+    // 生成月份和响应时间数组
+    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+                    "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
+    let responseTimeValues = months.map(m => responseTimes[m] || 1);
+
+    console.log("绘制折线图数据:", responseTimeValues);
+
+    if (boroughLineChart) {
+    boroughLineChart.destroy();
+}
+
+let ctx = document.getElementById('boroughLineChart').getContext('2d');
+boroughLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: months,
+        datasets: [{
+            label: `Response Time(sec) - ${boroughName}`,
+            data: responseTimeValues, // 确保这里是一个有效的数组
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderWidth: 2,
+            fill: true,
+            pointRadius: 5,
+            pointBackgroundColor: 'rgba(75, 192, 192, 1)'
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+
+}
+
+// 在 `mousemove` 事件里调用 `updateLineChart`
+map.on('mousemove', 'boroughs-layer', function (e) {
+    let boroughName = e.features[0].properties.NAME;
+    updateLineChart(boroughName);
+});
+
+</script>
+        
+        
+</body>
+</html>

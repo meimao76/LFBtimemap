@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- set view point and character -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+        
+    <!-- set page and description -->
+    <title>2024 London Emergency Response Network</title>
+    <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
+    
+    <!-- chart, D3, mapbox -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
+
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+
+    <!-- CSS & JS -->
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="script.js"></script>
+    
+    <!-- website icon -->
+    <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
+</head>
+    
+<body>    
+<!-- 1.Splash Screen -->
+<div id="splash-screen">
+    <h1>London Emergency Response Network</h1>
+    <p>Explore real-time fire response and incidents in London.</p>
+
+    <!-- 2.Map Button-->
+    <div class="button-container">
+    <button id="show-response-map">View Response Times</button>
+    <button id="show-fire-map">View Fire Incidents</button>
+    </div>
+</div>
+
+<!-- 3.mian content(not display at first) -->
+<div id="main-content" style="display: none;"></div>
+<!-- 4.map container-->
+<div id="map"></div>
+<!-- 5.information on top of map-->
+<div class="map-overlay top">
+    <!-- 5.1 slider -->
+    <div class="map-overlay-inner">
+        <h2>2024 London Fire Response Times</h2>
+        <table>
+            <tr>
+                <td>
+                    <input id="slider" type="range" min="0" max="11" step="1" value="0" list="tickmarks" />
+                    <datalist id="tickmarks">
+                        <option value="0" label="01">
+                        <option value="1">
+                        <option value="2">
+                        <option value="3">
+                        <option value="4">
+                        <option value="5" label="06">
+                        <option value="6">
+                        <option value="7">
+                        <option value="8">
+                        <option value="9">
+                        <option value="10">
+                        <option value="11" label="12">
+                    </datalist>
+                </td>
+                <td>
+                    <label id="month-label">24-01</label>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <!-- 5.3 chart -->
+    
+
+</div>
+
+
+    
+<script>
+// 0. Splash Screen
+document.addEventListener("DOMContentLoaded", function () {
+    const splashScreen = document.getElementById("splash-screen");
+    const mainContent = document.getElementById("main-content");
+    const responseButton = document.getElementById("show-response-map");
+    const fireButton = document.getElementById("show-fire-map");
+
+    function showMainContent() {
+        splashScreen.classList.add("fade-out");
+        setTimeout(() => {
+            splashScreen.style.display = "none";
+            mainContent.style.display = "block";
+        }, 1000);
+    }
+
+    // click “View Response Times” button to show the map
+    responseButton.addEventListener("click", function () {
+        showMainContent();
+        loadResponseMap(); // run the response time function
+    });
+
+    // click “View Fire Incidents” button to show fire map
+    fireButton.addEventListener("click", function () {
+        showMainContent();
+        loadFireMap(); // run the incidents function
+    });
+});
+
+// 1. basic map
+mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v10', 
+    center: [-0.1, 51.5], 
+    zoom: 12
+});
+
+// 2. adding fire station points
+const tooltip = new mapboxgl.Popup({
+    closeButton: false,
+    closeOnClick: false
+});
+
+d3.csv('firestation.csv').then(data => {
+    data.forEach(d => {
+        const marker = new mapboxgl.Marker({ color: '#4a010a' , scale: 0.5 })
+            .setLngLat([+d.Longitude, +d.Latitude])
+            .addTo(map);
+
+        marker.getElement().addEventListener('mouseenter', () => {
+            tooltip.setLngLat([+d.Longitude, +d.Latitude])
+                .setHTML(`<strong>${d.name}</strong>`)
+                .addTo(map);
+        });
+
+        marker.getElement().addEventListener('mouseleave', () => {
+            tooltip.remove();
+        });
+    });
+});
+
+// 4. adding fire acidents time
+// 1️⃣ 变量定义
+let responseGeojsonData = null; // 存储消防响应GeoJSON
+let responseLayer = null; // 事件点图层
+let connectionLayer = null; // 连接线图层
+let fireStationData = {}; // 存储消防站坐标
+
+// 2️⃣ 先加载消防站数据（假设有 firestation.geojson）
+// 1️⃣ 加载消防站点数据并添加自定义图标
+fetch('station.geojson')
+    .then(response => response.json())
+    .then(firestationGeojson => {
+        fireStationData = {}; // 清空存储的消防站数据
+        firestationGeojson.features.forEach(feature => {
+            let stationName = feature.properties.station;
+            let coordinates = feature.geometry.coordinates;
+            fireStationData[stationName] = coordinates; // 存储 {消防站名: [lng, lat]}
+        });
+    })
+    .catch(error => console.error("❌ 加载消防站数据失败:", error));
+
+
+// 3️⃣ 加载消防响应GeoJSON数据
+fetch('incident.geojson')
+    .then(response => response.json())
+    .then(geojson => {
+        responseGeojsonData = geojson; // 存储消防响应数据
+        updateResponseMap(selectedMonth); // 初始化地图
+    })
+    .catch(error => console.error("❌ 加载消防响应GeoJSON失败:", error));
+
+// 4️⃣ 更新地图上的点和连接线
+function updateResponseMap(month) {
+    if (!responseGeojsonData || Object.keys(fireStationData).length === 0) {
+        console.warn("⚠️ GeoJSON 数据或消防站数据未加载！");
+        return;
+    }
+
+    // 按月份筛选事件点数据
+    let filteredFeatures = responseGeojsonData.features.filter(feature => feature.properties.month === month);
+    let filteredGeojson = { "type": "FeatureCollection", "features": filteredFeatures };
+
+    // 生成连接线数据
+    let lineFeatures = filteredFeatures.map(feature => {
+        let stationName = feature.properties.station;
+        if (fireStationData[stationName]) {
+            return {
+                "type": "Feature",
+                "geometry": {
+                    "type": "LineString",
+                    "coordinates": [fireStationData[stationName], feature.geometry.coordinates]
+                },
+                "properties": { "station": stationName }
+            };
+        }
+    }).filter(feature => feature !== undefined);
+
+    let lineGeojson = { "type": "FeatureCollection", "features": lineFeatures };
+
+    // 移除旧的图层
+    if (responseLayer) {
+        map.removeLayer("response-points");
+        map.removeSource("response-points");
+    }
+    if (connectionLayer) {
+        map.removeLayer("connections");
+        map.removeSource("connections");
+    }
+
+    // 添加新事件点图层
+    map.addSource("response-points", { "type": "geojson", "data": filteredGeojson });
+    map.addLayer({
+        "id": "response-points",
+        "type": "circle",
+        "source": "response-points",
+        "paint": {
+            "circle-radius": 3,
+            "circle-color": "#ff5733", // 橙红色
+            "circle-opacity": 0.8
+        }
+    });
+
+    // 添加消防站到事件的连接线
+    map.addSource("connections", { "type": "geojson", "data": lineGeojson });
+    map.addLayer({
+        "id": "connections",
+        "type": "line",
+        "source": "connections",
+        "paint": {
+            "line-width": 1,
+            "line-opacity": 0.6,
+            "line-color": "blue"
+        },
+    });
+
+
+    responseLayer = "response-points"; // 记录当前图层ID
+    connectionLayer = "connections"; // 记录当前线图层ID
+}
+
+// 5️⃣ 监听滑动条，动态更新点和连接线
+document.getElementById('slider').addEventListener('input', function (e) {
+    const selectedIndex = parseInt(e.target.value, 10);
+    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+                    "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
+
+    if (selectedIndex >= 0 && selectedIndex < months.length) {
+        selectedMonth = months[selectedIndex];
+        document.getElementById('month-label').innerText = selectedMonth;
+        updateResponseMap(selectedMonth); // 更新地图数据
+    }
+});
+
+
+</script>
+        
+        
+</body>
+</html>
