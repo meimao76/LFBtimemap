@@ -6,18 +6,16 @@
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
         
     <!-- set page and description -->
-    <title>2024 London Emergency Response Network</title>
-    <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
-    
+    <title>2024 London Average Response Time</title>
+
     <!-- chart, D3, mapbox -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
-
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
 
     <!-- CSS & JS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_avg.css">
     <script defer src="script.js"></script>
     
     <!-- website icon -->
@@ -25,15 +23,19 @@
 </head>
     
 <body>    
-<!-- 3.mian content(not display at first) -->
-<div id="main-content" style="display: none;"></div>
-<!-- 4.map container-->
+<!-- 1.map container-->
 <div id="map"></div>
-<!-- 5.information on top of map-->
+
+<div class="nav-buttons">
+    <button id="show-home-page">Home Page</button>
+    <button id="show-fire-map">Fire Incidents Map</button>
+</div>
+
+<!-- 2.information on top of map-->
 <div class="map-overlay top">
-    <!-- 5.1 slider -->
+    <!-- 3.1 slider -->
     <div class="map-overlay-inner">
-        <h2>2024 London Fire Response Times</h2>
+        <h2>Choose Your Months Here</h2>
         <table>
             <tr>
                 <td>
@@ -59,21 +61,30 @@
             </tr>
         </table>
     </div>
-    <!-- 5.2 basic info -->
+    <!-- 3.2 basic info -->
     <div id="borough-info" class="borough-info-panel">
         <h2>Borough Information</h2>
         <p><strong>Name:</strong> <span id="Borough Name">-</span></p>
         <p><strong>Average Response Time:</strong> <span id="Average Response Time">-</span></p>
     </div>
-    <!-- 5.3 chart -->
+    <!-- 3.3 chart -->
     <div id="linechart" class="chart-container">
         <canvas id="boroughLineChart"></canvas>
-    </div>
-    
+    </div>  
 </div>
 
     
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("show-home-page").addEventListener("click", function () {
+        window.location.href = 'index.html';
+    });
+    
+    document.getElementById("show-fire-map").addEventListener("click", function () {
+        window.location.href = 'fireincidents.html';
+    });
+});
+
 // 1. basic map
 mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
 var map = new mapboxgl.Map({
@@ -91,7 +102,7 @@ const tooltip = new mapboxgl.Popup({
 
 d3.csv('firestation.csv').then(data => {
     data.forEach(d => {
-        const marker = new mapboxgl.Marker({ color: '#4a010a' , scale: 0.5 })
+        const marker = new mapboxgl.Marker({ color: '#FF9F68' , scale: 0.5 })
             .setLngLat([+d.Longitude, +d.Latitude])
             .addTo(map);
 
@@ -144,7 +155,7 @@ map.on('load', function () {
             'type': 'fill',
             'source': 'boroughs',
             'paint': {
-                'fill-color': '#FFFFFF', 
+                'fill-color': '#000000', 
                 'fill-opacity': 0.2 
             }
         });
@@ -183,27 +194,14 @@ map.on('load', function () {
                 
             let boroughName = feature.properties.NAME; // read Borough name
             let responseTimes; // read response time
-            try {
-                responseTimes = JSON.parse(feature.properties.response_times);
-            } catch (error) {
-                console.error("read response_times failed:", error);
-                responseTimes = {}; 
-            }
+            responseTimes = JSON.parse(feature.properties.response_times);
 
             // read raw times
             let rawTime = responseTimes[selectedMonth];
 
             // round times
             let responseTimeDisplay;
-            if (typeof rawTime === 'number') {
-                responseTimeDisplay = rawTime.toFixed(2) + " sec"; 
-                } else if (typeof rawTime === 'string') {
-                    const parsedNumber = parseFloat(rawTime);
-                    responseTimeDisplay = !isNaN(parsedNumber) ? parsedNumber.toFixed(2) + " sec" : "unvalid data";
-                } else {
-                    responseTimeDisplay = "unvalid data"; // undefined/null
-                }
-                
+            responseTimeDisplay = rawTime.toFixed(2) + "s";         
 
             document.getElementById('Borough Name').textContent = boroughName;
             document.getElementById('Average Response Time').textContent = responseTimeDisplay;
@@ -217,15 +215,10 @@ map.on('load', function () {
             document.getElementById('Average Response Time').textContent = "-";
         });
     })
-    .catch(error => console.error("Error loading borough data:", error));
 });
 
 // 3.6. update the color with data
 function updateMap(month) {
-    if (!map.getLayer('boroughs-layer') || !geojsonData) {
-        console.warn("Map layer or data not ready yet!");
-        return;
-    }
 
     selectedMonth = month; // choosing months
 
@@ -234,8 +227,8 @@ function updateMap(month) {
         ['has', ['to-string', month], ['get', 'response_times']], 
         ['interpolate', ['linear'],
             ['get', ['to-string', month], ['get', 'response_times']], 
-            240, '#f3e6db', // light yellow
-            400, '#c52222'  // pink red
+            250, '#ffd1a9', // light blue
+            400, '#580000'  // red
         ], 
         '#888888'
     ]);
@@ -246,8 +239,8 @@ function updateMap(month) {
             ['has', ['to-string', month], ['get', 'response_times']], 
             ['interpolate', ['linear'],
                 ['get', ['to-string', month], ['get', 'response_times']], 
-                240, '#f3e6db',
-                400, '#c52222'
+                250, '#ffd1a9',
+                400, '#580000'
             ], 
             '#888888' // gray with no data
         ]);
@@ -272,74 +265,73 @@ document.getElementById('slider').addEventListener('input', function (e) {
     }
 });
 
-let boroughLineChart; // 存储图表实例
+// 4. add line chart
+let boroughLineChart; // chart
 
-// 创建折线图
 function updateLineChart(boroughName) {
-    if (!geojsonData) {
-        console.warn("GeoJSON 数据未加载！");
-        return;
-    }
-
-    // 找到当前 Borough 数据
     let boroughFeature = geojsonData.features.find(f => f.properties.NAME === boroughName);
-    if (!boroughFeature) {
-        console.warn(`未找到 Borough: ${boroughName}`);
-        return;
-    }
+    let rawData = boroughFeature.properties.response_times;
+    let responseTimes;
+    responseTimes = rawData || {};
 
-    // 解析 `response_times` 数据
-    let responseTimes; // read response time
-            try {
-                responseTimes = JSON.parse(feature.properties.response_times);
-            } catch (error) {
-                console.error("read response_times failed:", error);
-                responseTimes = {}; 
-            }
-
-    // 生成月份和响应时间数组
+    // 4.1 creating dataframe
     const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
                     "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
-    let responseTimeValues = months.map(m => responseTimes[m] || 1);
-
-    console.log("绘制折线图数据:", responseTimeValues);
+    let responseTimeValues = months.map(m => {
+        let val = responseTimes[m];
+        return (val !== undefined && val !== null) ? val : NaN;
+    });
 
     if (boroughLineChart) {
-    boroughLineChart.destroy();
-}
+        boroughLineChart.destroy();
+    }
 
-let ctx = document.getElementById('boroughLineChart').getContext('2d');
-boroughLineChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: months,
-        datasets: [{
-            label: `Response Time(sec) - ${boroughName}`,
-            data: responseTimeValues, // 确保这里是一个有效的数组
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderWidth: 2,
+    let ctx = document.getElementById('boroughLineChart').getContext('2d');
+    boroughLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {labels: months,
+            datasets: [{
+            label: `Average Response Time(s) - ${boroughName}`,
+            data: responseTimeValues,
+            borderColor: 'rgba(255, 158, 121, 1)',
+            backgroundColor: 'rgba(255, 158, 121, 0.3)',
+            borderWidth: 3,
             fill: true,
             pointRadius: 5,
-            pointBackgroundColor: 'rgba(75, 192, 192, 1)'
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: { beginAtZero: true }
+            pointBackgroundColor: 'rgba(255, 158, 121, 1)'
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "white", // ✅ 将图例文字改为白色
+                        font: {size: 14} // ✅ 适当增大字体，提高可读性
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: "white" },
+                    grid: { color: "rgba(255,255,255,0.2)" }
+                },
+                y: {
+                    min: 150,
+                    max: 450,
+                    ticks: { color: "white" },
+                    grid: { color: "rgba(255,255,255,0.2)" }
+                }
+            }
         }
-    }
-});
+    });
+};
 
-}
 
-// 在 `mousemove` 事件里调用 `updateLineChart`
+// 4.3 use 'updateLineChart' in 'mousemove' 
 map.on('mousemove', 'boroughs-layer', function (e) {
     let boroughName = e.features[0].properties.NAME;
     updateLineChart(boroughName);
-});
-
+})
 </script>
         
         
