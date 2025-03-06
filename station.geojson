@@ -1,0 +1,1331 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.148299,
+          51.362274
+        ]
+      },
+      "properties": {
+        "station": "Wallington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.012523,
+          51.456281
+        ]
+      },
+      "properties": {
+        "station": "Lee Green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.004771,
+          51.629613
+        ]
+      },
+      "properties": {
+        "station": "Chingford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.109483,
+          51.463719
+        ]
+      },
+      "properties": {
+        "station": "Brixton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.228643,
+          51.588847
+        ]
+      },
+      "properties": {
+        "station": "Hendon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.090101,
+          51.510035
+        ]
+      },
+      "properties": {
+        "station": "Dowgate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.073621,
+          51.487051
+        ]
+      },
+      "properties": {
+        "station": "Old Kent Road"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.413885,
+          51.460636
+        ]
+      },
+      "properties": {
+        "station": "Feltham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.211113,
+          51.368943
+        ]
+      },
+      "properties": {
+        "station": "Sutton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.121625,
+          51.406776
+        ]
+      },
+      "properties": {
+        "station": "Norbury"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.298032,
+          51.392239
+        ]
+      },
+      "properties": {
+        "station": "Surbiton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.201404,
+          51.456432
+        ]
+      },
+      "properties": {
+        "station": "Wandsworth"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.116027,
+          51.561547
+        ]
+      },
+      "properties": {
+        "station": "Holloway"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.102278,
+          51.540261
+        ]
+      },
+      "properties": {
+        "station": "Islington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.032544,
+          51.521026
+        ]
+      },
+      "properties": {
+        "station": "Plaistow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.023685,
+          51.351901
+        ]
+      },
+      "properties": {
+        "station": "Addington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.014652,
+          51.510921
+        ]
+      },
+      "properties": {
+        "station": "Poplar"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.169294,
+          51.467115
+        ]
+      },
+      "properties": {
+        "station": "Battersea"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.18598,
+          51.647213
+        ]
+      },
+      "properties": {
+        "station": "Barnet"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.192838,
+          51.551679
+        ]
+      },
+      "properties": {
+        "station": "West Hampstead"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.077976,
+          51.473885
+        ]
+      },
+      "properties": {
+        "station": "Peckham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.212213,
+          51.521829
+        ]
+      },
+      "properties": {
+        "station": "North Kensington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.304021,
+          51.551702
+        ]
+      },
+      "properties": {
+        "station": "Wembley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.069076,
+          51.627229
+        ]
+      },
+      "properties": {
+        "station": "Edmonton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.243211,
+          51.614999
+        ]
+      },
+      "properties": {
+        "station": "Mill Hill"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.269096,
+          51.490494
+        ]
+      },
+      "properties": {
+        "station": "Chiswick"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.140883,
+          51.464906
+        ]
+      },
+      "properties": {
+        "station": "Clapham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.276923,
+          51.507045
+        ]
+      },
+      "properties": {
+        "station": "Acton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.03426,
+          51.408051
+        ]
+      },
+      "properties": {
+        "station": "Beckenham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.452172,
+          51.531999
+        ]
+      },
+      "properties": {
+        "station": "Hillingdon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.156403,
+          51.485609
+        ]
+      },
+      "properties": {
+        "station": "Erith"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.223606,
+          51.598368
+        ]
+      },
+      "properties": {
+        "station": "Harold Hill"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.179274,
+          51.597949
+        ]
+      },
+      "properties": {
+        "station": "Finchley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.122246,
+          51.493069
+        ]
+      },
+      "properties": {
+        "station": "Lambeth"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.056935,
+          51.523222
+        ]
+      },
+      "properties": {
+        "station": "East Ham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.12721,
+          51.586517
+        ]
+      },
+      "properties": {
+        "station": "Hornsey"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.431657,
+          51.49441
+        ]
+      },
+      "properties": {
+        "station": "Hayes"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.013066,
+          51.457016
+        ]
+      },
+      "properties": {
+        "station": "Lewisham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.181133,
+          51.593711
+        ]
+      },
+      "properties": {
+        "station": "Romford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.374438,
+          51.511293
+        ]
+      },
+      "properties": {
+        "station": "Southall"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.436703,
+          51.588393
+        ]
+      },
+      "properties": {
+        "station": "Ruislip"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.297588,
+          51.603666
+        ]
+      },
+      "properties": {
+        "station": "Stanmore"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.127421,
+          51.630486
+        ]
+      },
+      "properties": {
+        "station": "Southgate"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.284857,
+          51.467407
+        ]
+      },
+      "properties": {
+        "station": "Richmond"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.347618,
+          51.435167
+        ]
+      },
+      "properties": {
+        "station": "Twickenham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.094487,
+          51.426913
+        ]
+      },
+      "properties": {
+        "station": "Sidcup"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.236744,
+          51.544352
+        ]
+      },
+      "properties": {
+        "station": "Willesden"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.162705,
+          51.437827
+        ]
+      },
+      "properties": {
+        "station": "Tooting"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.197452,
+          51.41556
+        ]
+      },
+      "properties": {
+        "station": "Wimbledon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.264826,
+          51.53578
+        ]
+      },
+      "properties": {
+        "station": "Park Royal"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.049245,
+          51.473604
+        ]
+      },
+      "properties": {
+        "station": "New Cross"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.033856,
+          51.484828
+        ]
+      },
+      "properties": {
+        "station": "Deptford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.313907,
+          51.512086
+        ]
+      },
+      "properties": {
+        "station": "Ealing"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.170282,
+          51.487152
+        ]
+      },
+      "properties": {
+        "station": "Chelsea"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.076886,
+          51.562455
+        ]
+      },
+      "properties": {
+        "station": "Stoke Newington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.034088,
+          51.313601
+        ]
+      },
+      "properties": {
+        "station": "Biggin Hill"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.130762,
+          51.527687
+        ]
+      },
+      "properties": {
+        "station": "Euston"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.085533,
+          51.526636
+        ]
+      },
+      "properties": {
+        "station": "Shoreditch"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.105522,
+          51.369132
+        ]
+      },
+      "properties": {
+        "station": "Croydon"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.419101,
+          51.555869
+        ]
+      },
+      "properties": {
+        "station": "Northolt"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.028748,
+          51.589766
+        ]
+      },
+      "properties": {
+        "station": "Walthamstow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.055837,
+          51.510945
+        ]
+      },
+      "properties": {
+        "station": "Shadwell"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.069276,
+          51.515252
+        ]
+      },
+      "properties": {
+        "station": "Whitechapel"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.224291,
+          51.496127
+        ]
+      },
+      "properties": {
+        "station": "Hammersmith"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.089001,
+          51.529964
+        ]
+      },
+      "properties": {
+        "station": "Barking"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.220582,
+          51.564595
+        ]
+      },
+      "properties": {
+        "station": "Hornchurch"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.059425,
+          51.450686
+        ]
+      },
+      "properties": {
+        "station": "Eltham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.016741,
+          51.563132
+        ]
+      },
+      "properties": {
+        "station": "Leyton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.025571,
+          51.500809
+        ]
+      },
+      "properties": {
+        "station": "Millwall"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.306487,
+          51.429402
+        ]
+      },
+      "properties": {
+        "station": "Kingston"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.153649,
+          51.461114
+        ]
+      },
+      "properties": {
+        "station": "Bexley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.129964,
+          51.512469
+        ]
+      },
+      "properties": {
+        "station": "Soho"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.458645,
+          51.48021
+        ]
+      },
+      "properties": {
+        "station": "Heathrow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.200938,
+          51.477909
+        ]
+      },
+      "properties": {
+        "station": "Fulham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.062193,
+          51.385783
+        ]
+      },
+      "properties": {
+        "station": "Woodside"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.091501,
+          51.487457
+        ]
+      },
+      "properties": {
+        "station": "Plumstead"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.172744,
+          51.397194
+        ]
+      },
+      "properties": {
+        "station": "Mitcham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.008695,
+          51.560622
+        ]
+      },
+      "properties": {
+        "station": "Leytonstone"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.011171,
+          51.543736
+        ]
+      },
+      "properties": {
+        "station": "Stratford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.105541,
+          51.425989
+        ]
+      },
+      "properties": {
+        "station": "West Norwood"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.104399,
+          51.606178
+        ]
+      },
+      "properties": {
+        "station": "Hainault"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.024005,
+          51.609556
+        ]
+      },
+      "properties": {
+        "station": "Woodford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.110663,
+          51.372392
+        ]
+      },
+      "properties": {
+        "station": "Orpington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.190085,
+          51.502904
+        ]
+      },
+      "properties": {
+        "station": "Kensington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.245337,
+          51.399017
+        ]
+      },
+      "properties": {
+        "station": "New Malden"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.043939,
+          51.548654
+        ]
+      },
+      "properties": {
+        "station": "Homerton"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.070833,
+          51.500787
+        ]
+      },
+      "properties": {
+        "station": "Dockhead"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.071815,
+          51.592368
+        ]
+      },
+      "properties": {
+        "station": "Tottenham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.366348,
+          51.590801
+        ]
+      },
+      "properties": {
+        "station": "Harrow"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.343198,
+          51.475008
+        ]
+      },
+      "properties": {
+        "station": "Heston"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.013696,
+          51.473952
+        ]
+      },
+      "properties": {
+        "station": "Greenwich"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.141652,
+          51.552844
+        ]
+      },
+      "properties": {
+        "station": "Kentish Town"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.090084,
+          51.562109
+        ]
+      },
+      "properties": {
+        "station": "Ilford"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.183055,
+          51.520204
+        ]
+      },
+      "properties": {
+        "station": "Paddington"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.05355,
+          51.52784
+        ]
+      },
+      "properties": {
+        "station": "Bethnal Green"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.022144,
+          51.487005
+        ]
+      },
+      "properties": {
+        "station": "East Greenwich"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.016881,
+          51.407079
+        ]
+      },
+      "properties": {
+        "station": "Bromley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.15743,
+          51.559294
+        ]
+      },
+      "properties": {
+        "station": "Dagenham"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.05173,
+          51.66023
+        ]
+      },
+      "properties": {
+        "station": "Enfield"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.044955,
+          51.44272
+        ]
+      },
+      "properties": {
+        "station": "Forest Hill"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -0.124319,
+          51.331841
+        ]
+      },
+      "properties": {
+        "station": "Purley"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          0.220954,
+          51.506455
+        ]
+      },
+      "properties": {
+        "station": "Wennington"
+      }
+    }
+  ]
+}
