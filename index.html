@@ -28,19 +28,33 @@
 <!-- 1.Splash Screen -->
 <div id="splash-screen">
     <h1>London Emergency Response Network</h1>
-    <p>Explore real-time fire response and incidents in London.</p>
-
+    <h2>Explore real-time fire response and incidents in London 2024.</h2>
+    
     <!-- 2.Map Button-->
     <div class="button-container">
-    <button id="show-response-map">View Response Times</button>
-    <button id="show-fire-map">View Fire Incidents</button>
+    <button id="show-response-map">View Response Time Across London</button>
+    <button id="show-fire-map">View Response Time In Incidents</button>
     </div>
+
+    <p>
+        Welcome to the <strong><em>London Emergency Response Network</em></strong> visualization platform. <br>
+        <br>
+        Based on the real fire response data of <em> London Fire Bridge </em> from Jan to Dec in 2024, 
+        this platform analyzes the spatial distribution of fire response time in different areas of the city, 
+        wishing to help the public have a better understanding of the fairness and efficiency of urban public safety services. <br>
+        <br>
+        With an interactive map, you can visually explore fire incidents and fire response performance 
+        in different areas of London and understand the spatial characteristics of the city's emergency response system.
+    </p>
+    
 </div>
 
 <!-- 3.mian content(not display at first) -->
-<div id="main-content" style="display: none;"></div>
-<!-- 4.map container-->
-<div id="map"></div>
+<div id="main-content" style="display: none;">
+    <!-- 4.map container-->
+    <div id="map"></div>
+</div>
+
     
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -52,7 +66,7 @@
             window.location.href = 'fireincidents.html';
         });
     });
-    </script>
+</script>
           
 </body>
 </html>
