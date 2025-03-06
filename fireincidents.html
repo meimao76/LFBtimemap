@@ -25,17 +25,6 @@
 </head>
     
 <body>    
-<!-- 1.Splash Screen -->
-<div id="splash-screen">
-    <h1>London Emergency Response Network</h1>
-    <p>Explore real-time fire response and incidents in London.</p>
-
-    <!-- 2.Map Button-->
-    <div class="button-container">
-    <button id="show-response-map">View Response Times</button>
-    <button id="show-fire-map">View Fire Incidents</button>
-    </div>
-</div>
 
 <!-- 3.mian content(not display at first) -->
 <div id="main-content" style="display: none;"></div>
@@ -79,33 +68,6 @@
 
     
 <script>
-// 0. Splash Screen
-document.addEventListener("DOMContentLoaded", function () {
-    const splashScreen = document.getElementById("splash-screen");
-    const mainContent = document.getElementById("main-content");
-    const responseButton = document.getElementById("show-response-map");
-    const fireButton = document.getElementById("show-fire-map");
-
-    function showMainContent() {
-        splashScreen.classList.add("fade-out");
-        setTimeout(() => {
-            splashScreen.style.display = "none";
-            mainContent.style.display = "block";
-        }, 1000);
-    }
-
-    // click “View Response Times” button to show the map
-    responseButton.addEventListener("click", function () {
-        showMainContent();
-        loadResponseMap(); // run the response time function
-    });
-
-    // click “View Fire Incidents” button to show fire map
-    fireButton.addEventListener("click", function () {
-        showMainContent();
-        loadFireMap(); // run the incidents function
-    });
-});
 
 // 1. basic map
 mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
