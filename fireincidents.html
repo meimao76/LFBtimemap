@@ -7,17 +7,15 @@
         
     <!-- set page and description -->
     <title>2024 London Emergency Response Network</title>
-    <meta name="description" content="Explore real-time emergency response data and incidents in London with an interactive map visualization.">
-    
+
     <!-- chart, D3, mapbox -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>  <!-- Chart -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
-
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
 
     <!-- CSS & JS -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles_inc.css">
     <script defer src="script.js"></script>
     
     <!-- website icon -->
@@ -26,15 +24,18 @@
     
 <body>    
 
-<!-- 3.mian content(not display at first) -->
-<div id="main-content" style="display: none;"></div>
-<!-- 4.map container-->
+<!-- 1.map container-->
 <div id="map"></div>
-<!-- 5.information on top of map-->
+<!-- 2.page top-->
+<div class="nav-buttons">
+    <button id="show-home-page">Home Page</button>
+    <button id="show-time-map">Average Time Map</button>
+</div>
+<!-- 3.information on top of map-->
 <div class="map-overlay top">
-    <!-- 5.1 slider -->
+    <!-- 3.1 slider -->
     <div class="map-overlay-inner">
-        <h2>2024 London Fire Response Times</h2>
+        <h2>Choose Your Months Here</h2>
         <table>
             <tr>
                 <td>
@@ -60,14 +61,59 @@
             </tr>
         </table>
     </div>
-    <!-- 5.3 chart -->
+    <!-- 3.2 basic info -->
+    <div id="borough-info" class="borough-info-panel">
+        <h2>Borough Information</h2>
+        <p><strong>Name:</strong> <span id="Borough Name">-</span></p>
+        <p><strong>Reported Fire Incidents:</strong> <span id="Incidents Counts">-</span></p>
+    </div>
+    <!-- 3.3 chart -->
     
 
+</div>
+
+<!-- 4. description -->
+<div id="sidebar">
+    <div id="sidebar-header">
+        <h2>About this map: </h2>
+        <button id="toggle-sidebar">➡</button>
+    </div>
+    <div id="sidebar-content">
+        <p>This page shows the spatial distribution of London fire response times in 2024. <br>
+        <br>
+        You can use the slider to select the month and see the average response time for different areas.
+        Move the mouse over an area on the map to see specific response time trends in the line chart. <br>
+        <br>
+        The international standard fire response time is 360s, here you can compare which areas are out of limit in the line chart.</p>
+    </div>
 </div>
 
 
     
 <script>
+//0. the top area
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("show-home-page").addEventListener("click", function () {
+        window.location.href = 'index.html';
+    });
+    
+    document.getElementById("show-time-map").addEventListener("click", function () {
+        window.location.href = 'responsetime.html';
+    });
+});
+
+document.getElementById("toggle-sidebar").addEventListener("click", function () {
+    let sidebar = document.getElementById("sidebar");
+    let button = document.getElementById("toggle-sidebar");
+
+    if (sidebar.classList.contains("collapsed")) {
+        sidebar.classList.remove("collapsed");
+        button.innerText = "➡"; // right, show out
+    } else {
+        sidebar.classList.add("collapsed");
+        button.innerText = "⬅"; // left, hide 
+    }
+});
 
 // 1. basic map
 mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
@@ -86,7 +132,7 @@ const tooltip = new mapboxgl.Popup({
 
 d3.csv('firestation.csv').then(data => {
     data.forEach(d => {
-        const marker = new mapboxgl.Marker({ color: '#4a010a' , scale: 0.5 })
+        const marker = new mapboxgl.Marker({ color: '#FF9F68' , scale: 0.5 })
             .setLngLat([+d.Longitude, +d.Latitude])
             .addTo(map);
 
@@ -102,49 +148,190 @@ d3.csv('firestation.csv').then(data => {
     });
 });
 
-// 4. adding fire acidents time
-// 1️⃣ 变量定义
-let responseGeojsonData = null; // 存储消防响应GeoJSON
-let responseLayer = null; // 事件点图层
-let connectionLayer = null; // 连接线图层
-let fireStationData = {}; // 存储消防站坐标
-
-// 2️⃣ 先加载消防站数据（假设有 firestation.geojson）
-// 1️⃣ 加载消防站点数据并添加自定义图标
-fetch('station.geojson')
-    .then(response => response.json())
-    .then(firestationGeojson => {
-        fireStationData = {}; // 清空存储的消防站数据
-        firestationGeojson.features.forEach(feature => {
-            let stationName = feature.properties.station;
-            let coordinates = feature.geometry.coordinates;
-            fireStationData[stationName] = coordinates; // 存储 {消防站名: [lng, lat]}
-        });
-    })
-    .catch(error => console.error("❌ 加载消防站数据失败:", error));
-
-
-// 3️⃣ 加载消防响应GeoJSON数据
-fetch('incident.geojson')
+let geojsonData = null; 
+let selectedMonth = "24-01"; 
+let hoveredBoroughId = null;
+    
+map.on('load', function () {
+    fetch('boroughs_updated.geojson')
     .then(response => response.json())
     .then(geojson => {
-        responseGeojsonData = geojson; // 存储消防响应数据
-        updateResponseMap(selectedMonth); // 初始化地图
-    })
-    .catch(error => console.error("❌ 加载消防响应GeoJSON失败:", error));
+        geojsonData = geojson; // geojson
+        geojson.features.forEach((feature, index) => {
+            feature.id = index;
+        });
+        map.addSource('boroughs', { 'type': 'geojson', 'data': geojson });
 
-// 4️⃣ 更新地图上的点和连接线
-function updateResponseMap(month) {
-    if (!responseGeojsonData || Object.keys(fireStationData).length === 0) {
-        console.warn("⚠️ GeoJSON 数据或消防站数据未加载！");
-        return;
+        // 3.1. borough boundaries
+        map.addLayer({
+            'id': 'boroughs-outline',
+            'type': 'line',
+            'source': 'boroughs',
+            'paint': {
+                'line-color': '#FFFFFF',  // white
+                'line-opacity':0.6,
+                'line-width': [
+                    'case',
+                    ['boolean',['feature-state','hover'],false],5,
+                    1
+                ]
+            }
+        });
+
+        // 3.2. borough fill color
+        map.addLayer({
+            'id': 'boroughs-layer',
+            'type': 'fill',
+            'source': 'boroughs',
+            'paint': {
+                'fill-color': '#FFFFFF', 
+                'fill-opacity': 0.1 
+            }
+        });
+
+        // 3.3. emphasizing the borough
+        map.addLayer({
+            'id': 'boroughs-extrusion',
+            'type': 'fill-extrusion',
+            'source': 'boroughs',
+            'paint': {
+                'fill-extrusion-color': '#FFFFFF',
+                'fill-extrusion-opacity': 0.1,
+                'fill-extrusion-height': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false], 1000, // hovering height
+                    0  // normal height 0
+                ]
+            }
+        });
+            
+        map.moveLayer('boroughs-outline'); // make sure the boundary is always on top
+        updateMap("24-01"); // update the map color
+
+        // 3.4. showing the information when hovering over boroughs
+        map.on('mousemove', 'boroughs-layer', function (e) {
+            map.getCanvas().style.cursor = 'default';
+
+            let feature = e.features[0];
+                
+            if (hoveredBoroughId !== null) {
+                map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: false });
+            }
+
+            hoveredBoroughId = feature.id;
+            map.setFeatureState({ source: 'boroughs', id: hoveredBoroughId }, { hover: true });
+                
+            let boroughName = feature.properties.NAME; // read Borough name
+            let incidentTimes; // read response time
+            incidentTimes = JSON.parse(feature.properties.incident_counts);
+
+            // read raw times
+            let rawcount = incidentTimes[selectedMonth];
+
+            // round times
+            let incidentTimeDisplay;
+            incidentTimeDisplay = rawcount.toFixed(0);         
+
+            document.getElementById('Borough Name').textContent = boroughName;
+            document.getElementById('Incidents Counts').textContent = incidentTimeDisplay;
+        });
+
+            
+
+        // 3.5. remove the information
+        map.on('mouseleave', 'boroughs-layer', function () {
+            document.getElementById('Borough Name').textContent = "-";
+            document.getElementById('Incidents Counts').textContent = "-";
+        });
+    })
+});
+
+// 3.6. update the color with data
+function updateMap(month) {
+
+    selectedMonth = month; // choosing months
+
+    map.setPaintProperty('boroughs-layer', 'fill-color', [
+        'case',
+        ['has', ['to-string', month], ['get', 'incident_counts']], 
+        ['interpolate', ['linear'],
+            ['get', ['to-string', month], ['get', 'incident_counts']], 
+            10, '#FBDCC4', // light blue
+            40, '#7D0633'  // red
+        ], 
+        '#888888'
+    ]);
+
+    if (map.getLayer('boroughs-extrusion')) {
+        map.setPaintProperty('boroughs-extrusion', 'fill-extrusion-color', [
+            'case',
+            ['has', ['to-string', month], ['get', 'incident_counts']], 
+            ['interpolate', ['linear'],
+                ['get', ['to-string', month], ['get', 'incident_counts']], 
+                10, '#FBDCC4',
+                40, '#7D0633'
+            ], 
+            '#888888' // gray with no data
+        ]);
     }
 
-    // 按月份筛选事件点数据
+    // slid to change the layer
+    map.setPaintProperty('boroughs-layer', 'fill-opacity', 0.6);
+}
+
+// 3.7. listen for slider and update the map
+document.getElementById('slider').addEventListener('input', function (e) {
+    const selectedIndex = parseInt(e.target.value, 10);  // set the key
+    const months = [
+        "24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+        "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"
+    ];
+    
+    if (selectedIndex >= 0 && selectedIndex < months.length) {
+        const selectedMonth = months[selectedIndex];
+        document.getElementById('month-label').innerText = selectedMonth;
+        updateMap(selectedMonth);
+    }
+});
+
+// 4. adding fire acidents time
+let responseGeojsonData = null; // GeoJSON
+let responseLayer = null; // incidents points layer
+let connectionLayer = null; // line
+let fireStationData = {}; // firestation
+
+map.on('load', function () {
+
+    
+// 4.1 adding the station geojson
+fetch('station.geojson')
+.then(response => response.json())
+.then(firestationGeojson => {
+    fireStationData = {}; // clear the former station dataframe
+    firestationGeojson.features.forEach(feature => {
+        let stationName = feature.properties.station;
+        let coordinates = feature.geometry.coordinates;
+        fireStationData[stationName] = coordinates; // save new station frame
+    });
+})
+    
+// 4.2 adding fire incidents geojson
+fetch('incident_cleaned.geojson')
+.then(response => response.json())
+.then(geojson => {
+    responseGeojsonData = geojson; 
+    updateResponseMap(selectedMonth); 
+})
+
+})
+
+// 4.3 update the line on the map
+function updateResponseMap(month) {
+    // select the data according to months
     let filteredFeatures = responseGeojsonData.features.filter(feature => feature.properties.month === month);
     let filteredGeojson = { "type": "FeatureCollection", "features": filteredFeatures };
 
-    // 生成连接线数据
+    // creat line
     let lineFeatures = filteredFeatures.map(feature => {
         let stationName = feature.properties.station;
         if (fireStationData[stationName]) {
@@ -161,17 +348,11 @@ function updateResponseMap(month) {
 
     let lineGeojson = { "type": "FeatureCollection", "features": lineFeatures };
 
-    // 移除旧的图层
-    if (responseLayer) {
-        map.removeLayer("response-points");
-        map.removeSource("response-points");
-    }
-    if (connectionLayer) {
-        map.removeLayer("connections");
-        map.removeSource("connections");
-    }
+    // remove old layers
+    if (responseLayer) {map.removeLayer("response-points");map.removeSource("response-points");}
+    if (connectionLayer) {map.removeLayer("connections");map.removeSource("connections");}
 
-    // 添加新事件点图层
+    // add new incidents layer
     map.addSource("response-points", { "type": "geojson", "data": filteredGeojson });
     map.addLayer({
         "id": "response-points",
@@ -179,12 +360,12 @@ function updateResponseMap(month) {
         "source": "response-points",
         "paint": {
             "circle-radius": 3,
-            "circle-color": "#ff5733", // 橙红色
+            "circle-color": "#ff5733", 
             "circle-opacity": 0.8
         }
     });
 
-    // 添加消防站到事件的连接线
+    // add the line link the station and the incidents
     map.addSource("connections", { "type": "geojson", "data": lineGeojson });
     map.addLayer({
         "id": "connections",
@@ -197,12 +378,27 @@ function updateResponseMap(month) {
         },
     });
 
+    responseLayer = "response-points"; 
+    connectionLayer = "connections"; 
 
-    responseLayer = "response-points"; // 记录当前图层ID
-    connectionLayer = "connections"; // 记录当前线图层ID
+// 1️⃣ 加载 Borough 数据
+
 }
 
-// 5️⃣ 监听滑动条，动态更新点和连接线
+// 5️⃣ 监听滑动条，更新 Borough 颜色
+document.getElementById('slider').addEventListener('input', function (e) {
+    const selectedIndex = parseInt(e.target.value, 10);
+    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+                    "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
+    if (selectedIndex >= 0 && selectedIndex < months.length) {
+        selectedMonth = months[selectedIndex];
+        document.getElementById('month-label').innerText = selectedMonth;
+        updateBoroughs(selectedMonth); // 更新地图颜色
+    }
+});
+
+
+// 5️⃣ listen to slider to update
 document.getElementById('slider').addEventListener('input', function (e) {
     const selectedIndex = parseInt(e.target.value, 10);
     const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
@@ -214,10 +410,9 @@ document.getElementById('slider').addEventListener('input', function (e) {
         updateResponseMap(selectedMonth); // 更新地图数据
     }
 });
-
-
 </script>
         
         
 </body>
+
 </html>
