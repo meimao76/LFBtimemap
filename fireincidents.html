@@ -277,26 +277,30 @@ function getColorByResponseTime(d) {
 let stationMarkers = [];
 let selectedMonthIndex = 0;
 
-// 加载消防站 CSV 数据，创建 Marker 并根据当前月份设置颜色
+// load station CSV，creat Marker to set color according to time and months
 d3.csv('firestation3.csv').then(data => {
   data.forEach(d => {
     const stationName = d.station;
-    // 获取当前月份的响应时间，如果没有则默认 minResponse
+    // fetch the data
     let responseTime = stationDataDict[stationName] ? stationDataDict[stationName][selectedMonthIndex] : minResponse;
-    // 根据响应时间计算 Marker 颜色
+    // calculate color 
     let markerColor = getColorForResponse(responseTime);
     
     const marker = new mapboxgl.Marker({ color: markerColor, scale: 0.5 })
-      .setLngLat([+d.Longitude, +d.Latitude])
-      .addTo(map);
+       .setLngLat([+d.Longitude, +d.Latitude])
+       .addTo(map);
 
-    // 保存 Marker 引用和消防站名称，方便后续更新颜色
+    const markerEl = marker.getElement();
+    
+
+    // save Marker frame
     stationMarkers.push({
-      station: stationName,
-      marker: marker
+        station: stationName,
+        marker: marker
     });
 
-    // 鼠标进入时更新折线图（此处可保持原有逻辑）
+
+    // update line chart when mouse enter
     marker.getElement().addEventListener('mouseenter', () => {
       console.log(" mousemovein：", stationName);
       if (stationDataDict[stationName] && window.myLineChart) {
@@ -308,32 +312,24 @@ d3.csv('firestation3.csv').then(data => {
   });
 });
 
-// 监听月份滑块变化，根据选中的月份更新 Marker 的颜色
+// Monitor the change of the month slider and update the Marker color according to the selected month
 document.getElementById('slider').addEventListener('input', function (e) {
-  // 根据滑块值更新 selectedMonthIndex，这里假设滑块的值就是索引
-  selectedMonthIndex = parseInt(e.target.value, 10);
-  // 更新月份显示标签（假设你的月份数组如下）
-  const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
+    // Update selectedMonthIndex with the slider value
+    selectedMonthIndex = parseInt(e.target.value, 10);
+    // update months tag
+    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
                   "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
 
-  // 遍历所有 Marker，根据新的月份重新计算颜色
-  stationMarkers.forEach(item => {
-  const stationName = item.station;
-  let responseTime = stationDataDict[stationName] ? stationDataDict[stationName][selectedMonthIndex] : minResponse;
-  let newColor = getColorForResponse(responseTime);
-  let markerEl = item.marker.getElement();
-  // 查询 marker 内部的 SVG 路径
-  let svgPath = markerEl.querySelector('svg path');
-  if (svgPath) {
-    // 修改 SVG 路径的填充色
-    svgPath.setAttribute('fill', newColor);
-  } else {
-    // 如果没有 SVG，则备选方案：更新背景颜色并保持圆角（如果你之前用过圆角样式）
-    markerEl.style.backgroundColor = newColor;
-    markerEl.style.borderRadius = '50%';
-  }
-});
+    // Go through all the markers and recalculate the colors based on the new month
+    stationMarkers.forEach(item => {
+        const stationName = item.station;
+        let responseTime = stationDataDict[stationName] ? stationDataDict[stationName][selectedMonthIndex] : minResponse;
+        let newColor = getColorForResponse(responseTime);
+        let markerEl = item.marker.getElement();
 
+        let svgPath = markerEl.querySelector('svg path');
+        if (svgPath) {svgPath.setAttribute('fill', newColor);}// change the color filled
+    });
 });
 
 
@@ -496,8 +492,6 @@ function updateResponseMap(month) {
         map.removeLayer('arc-layer');
     }
 
-      
-
     // add new ArcLayer
     const arcLayer = new deck.MapboxLayer({
         id: 'arc-layer',
@@ -527,11 +521,6 @@ document.getElementById('slider').addEventListener('input', function (e) {
         updateResponseMap(selectedMonth);
     }
 });
-
-
-</script>
-        
-        
+</script>     
 </body>
-
 </html>
