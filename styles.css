@@ -24,7 +24,7 @@ body {
     align-items: right;
     text-align: center;
     z-index: 1000;
-    background-image: url('https://github.com/meimao76/LFBtimemap/blob/main/background.jpg?raw=true');
+    background-image: url('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/background.jpg');
     background-size: cover; 
     background-position: center; 
     background-repeat: no-repeat; 

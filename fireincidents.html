@@ -21,7 +21,7 @@
     <script src="https://unpkg.com/deck.gl@8.8.19/dist.min.js"></script>
 
     <!-- CSS & JS -->
-    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="https://meimao76.github.io/LFBtimemap/styles2.css">
     
     <!-- website icon -->
     <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
@@ -116,11 +116,11 @@
 //0. the top area
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("show-home-page").addEventListener("click", function () {
-        window.location.href = 'index.html';
+        window.location.href = 'https://meimao76.github.io/LFBtimemap/index.html';
     });
     
     document.getElementById("show-time-map").addEventListener("click", function () {
-        window.location.href = 'responsetime.html';
+        window.location.href = 'https://meimao76.github.io/LFBtimemap/responsetime.html';
     });
 });
 
@@ -161,7 +161,7 @@ const tooltip = new mapboxgl.Popup({
 // 2.1 station data
 let stationDataDict = {};
 
-d3.csv('stations_avg_response.csv').then(data => {
+d3.csv('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/stations_avg_response.csv').then(data => {
     data.forEach(row => {
         stationDataDict[row.station] = [
             +row["24-01"], +row["24-02"], +row["24-03"], +row["24-04"],
@@ -278,7 +278,7 @@ let stationMarkers = [];
 let selectedMonthIndex = 0;
 
 // load station CSV，creat Marker to set color according to time and months
-d3.csv('firestation3.csv').then(data => {
+d3.csv('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/firestation3.csv').then(data => {
   data.forEach(d => {
     const stationName = d.station;
     // fetch the data
@@ -340,7 +340,7 @@ let geojsonData = null;
 let hoveredBoroughId = null;
     
 map.on('load', function () {
-    fetch('boroughs_updated.geojson')
+    fetch('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/boroughs_updated.geojson')
     .then(response => response.json())
     .then(geojson => {
         geojsonData = geojson; // geojson
@@ -449,8 +449,8 @@ let selectedMonth = "24-01";
 
 map.on('load', () => {
     Promise.all([
-        fetch('station.geojson').then(r => r.json()),
-        fetch('incident_standardized_filtered.geojson').then(r => r.json())
+        fetch('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/station.geojson').then(r => r.json()),
+        fetch('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/incident_standardized_filtered.geojson').then(r => r.json())
     ]).then(([firestationGeojson, incidentGeojson]) => {
         // for stations
         fireStationData = {};

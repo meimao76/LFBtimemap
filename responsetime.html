@@ -17,7 +17,7 @@
 
 
     <!-- CSS & JS -->
-    <link rel="stylesheet" href="styles2.css">
+    <link rel="stylesheet" href="https://meimao76.github.io/LFBtimemap/styles2.css">
     
     <!-- website icon -->
     <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
@@ -108,11 +108,11 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("show-home-page").addEventListener("click", function () {
-        window.location.href = 'index.html';
+        window.location.href = 'https://meimao76.github.io/LFBtimemap/index.html';
     });
     
     document.getElementById("show-fire-map").addEventListener("click", function () {
-        window.location.href = 'fireincidents.html';
+        window.location.href = 'https://meimao76.github.io/LFBtimemap/fireincidents.html';
     });
 });
 
@@ -153,7 +153,7 @@ const tooltip = new mapboxgl.Popup({
     closeOnClick: false
 });
 
-d3.csv('firestation.csv').then(data => {
+d3.csv('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/firestation.csv').then(data => {
     data.forEach(d => {
         const marker = new mapboxgl.Marker({ color: '#7D1C4A' , scale: 0.5 })
             .setLngLat([+d.Longitude, +d.Latitude])
@@ -177,7 +177,7 @@ let selectedMonth = "24-01";
 let hoveredBoroughId = null;
     
 map.on('load', function () {
-    fetch('boroughs_merged.geojson')
+    fetch('https://raw.githubusercontent.com/meimao76/LFBtimemap/refs/heads/main/boroughs_merged.geojson')
     .then(response => response.json())
     .then(geojson => {
         geojsonData = geojson; // geojson
