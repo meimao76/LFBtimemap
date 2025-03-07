@@ -17,8 +17,7 @@
 
 
     <!-- CSS & JS -->
-    <link rel="stylesheet" href="styles_avg.css">
-    <script defer src="script.js"></script>
+    <link rel="stylesheet" href="styles2.css">
     
     <!-- website icon -->
     <link rel="icon" href="https://github.com/meimao76/LFBtimemap/blob/main/time.png?raw=true" type="image/x-icon">
@@ -96,7 +95,8 @@
     <div id="sidebar-content">
         <p>This page shows the spatial distribution of London fire response times in 2024. <br>
         <br>
-        You can use the slider to select the month and see the average response time for different areas.
+        You can use the slider to select the month and see the average response time for different areas. <br>
+        <br>
         Move the mouse over an area on the map to see specific response time trends in the line chart. <br>
         <br>
         The international standard fire response time is 360s, here you can compare which areas are out of limit in the line chart.</p>
@@ -137,7 +137,9 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/dark-v10', 
     center: [-0.1, 51.5], 
-    zoom: 12
+    zoom: 10,
+    pitch: 60,
+    bearing: -20
 });
 
 map.addControl(new mapboxgl.ScaleControl({
@@ -153,7 +155,7 @@ const tooltip = new mapboxgl.Popup({
 
 d3.csv('firestation.csv').then(data => {
     data.forEach(d => {
-        const marker = new mapboxgl.Marker({ color: '#FF9F68' , scale: 0.5 })
+        const marker = new mapboxgl.Marker({ color: '#7D1C4A' , scale: 0.5 })
             .setLngLat([+d.Longitude, +d.Latitude])
             .addTo(map);
 
@@ -227,8 +229,8 @@ map.on('load', function () {
             }
         });
             
-        map.moveLayer('boroughs-outline'); // make sure the boundary is always on top
         updateMap("24-01"); // update the map color
+        map.moveLayer('boroughs-outline'); // make sure the boundary is always on top
 
         // 3.4. showing the information when hovering over boroughs
         map.on('mousemove', 'boroughs-layer', function (e) {
@@ -278,8 +280,8 @@ function updateMap(month) {
         ['has', ['to-string', month], ['get', 'response_times']], 
         ['interpolate', ['linear'],
             ['get', ['to-string', month], ['get', 'response_times']], 
-            250, '#ffd1a9', // light blue
-            400, '#580000'  // red
+            300, '#C4E4FF', // light blue
+            400, '#D20062'  // red
         ], 
         '#888888'
     ]);
@@ -290,8 +292,8 @@ function updateMap(month) {
             ['has', ['to-string', month], ['get', 'response_times']], 
             ['interpolate', ['linear'],
                 ['get', ['to-string', month], ['get', 'response_times']], 
-                250, '#ffd1a9',
-                400, '#580000'
+                250, '#C4E4FF',
+                400, '#D20062'
             ], 
             '#888888' // gray with no data
         ]);
@@ -338,66 +340,59 @@ function updateLineChart(boroughName) {
     }
 
     let ctx = document.getElementById('boroughLineChart').getContext('2d');
-boroughLineChart = new Chart(ctx, {
-    type: 'line',
-    data: {labels: months,
-        datasets: [{
-            label: `Average Response Time(s) - ${boroughName}`,
-            data: responseTimeValues,
-            borderColor: 'rgba(255, 158, 121, 1)',
-            backgroundColor: 'rgba(255, 158, 121, 0.3)',
-            borderWidth: 3,
-            fill: true,
-            pointRadius: 5,
-            pointBackgroundColor: 'rgba(255, 158, 121, 1)'
-        }]
-    },
-    options: {
-        plugins: {
-            legend: {
-                labels: {
-                    color: "white",
-                    font: {size: 14}
-                }
-            },
-            annotation: {
-                annotations: {
-                    line1: {
-                        type: 'line',
-                        yMin: 360,
-                        yMax: 360,
-                        borderColor: 'white',
-                        borderWidth: 1,
-                        borderDash: [5, 5], // turn into dash
-                        label: {
-                            content: '360s',
-                            enabled: true,
-                            position: 'start',
-                            backgroundColor: 'rgba(0,0,0,0.4)',
-                            color: 'white',
-                            font: { size: 8 }
+    boroughLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {labels: months,
+            datasets: [{
+                label: `Average Response Time(s) - ${boroughName}`,
+                data: responseTimeValues,
+                borderColor: 'rgba(214, 88, 159, 1)',
+                backgroundColor: 'rgba(214, 88, 159, 0.3)',
+                fill: false,
+                tension: 0.1
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {color: "white", font: {size: 14}}
+                },
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            yMin: 360,
+                            yMax: 360,
+                            borderColor: 'white',
+                            borderWidth: 1,
+                            borderDash: [5, 5], // turn into dash
+                            label: {
+                                content: '360s',
+                                enabled: true,
+                                position: 'start',
+                                backgroundColor: 'rgba(0,0,0,0.4)',
+                                color: 'white',
+                                font: { size: 8 }
+                            }
                         }
                     }
                 }
-            }
-        },
-        scales: {
-            x: {
-                ticks: { color: "white" },
-                grid: { color: "rgba(255,255,255,0.2)" }
             },
-            y: {
-                min: 150,
-                max: 450,
-                ticks: { color: "white" },
-                grid: { color: "rgba(255,255,255,0.2)" }
+            scales: {
+                x: {
+                    ticks: { color: "white" },
+                    grid: { color: "rgba(255,255,255,0.2)" }
+                },
+                y: {
+                    min: 200,
+                    max: 500,
+                    ticks: { color: "white" },
+                    grid: { color: "rgba(255,255,255,0.2)" }
+                }
             }
         }
-    }
-});
-
+    });
 };
-
 
 // 4.3 use 'updateLineChart' in 'mousemove' 
 map.on('mousemove', 'boroughs-layer', function (e) {
