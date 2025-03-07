@@ -81,10 +81,10 @@
         <h3>Incidents Response Time (s)</h3>
         <div class="gradient-bar"></div>
         <div class="legend-labels">
-            <span>0</span>
-            <span>200</span>
-            <span>400</span>
-            <span>600+</span>
+            <span>100</span>
+            <span>300</span>
+            <span>500</span>
+            <span>700+</span>
         </div>
     </div>  
 
@@ -103,7 +103,7 @@
         <br>
         Move the mouse over an area on the map to see the number of incidetns happend each months. <br>
         <br>
-        Move over the fire station to see more information.<br>
+        Move the fire station to see more information.<br>
         <br>
         The international standard fire response time is 360s, here you can compare which stastion are longer than standard in the line chart.</p>
     </div>
@@ -148,58 +148,62 @@ var map = new mapboxgl.Map({
     bearing: -20
 });
 
+map.addControl(new mapboxgl.ScaleControl({
+    maxWidth: 200, 
+    unit: 'metric' // unit
+}));
+
 // 2. adding fire station points
 const tooltip = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false
 });
-// station data
+// 2.1 station data
 let stationDataDict = {};
 
 d3.csv('stations_avg_response.csv').then(data => {
-  data.forEach(row => {
-    stationDataDict[row.station] = [
-      +row["24-01"], +row["24-02"], +row["24-03"], +row["24-04"],
-      +row["24-05"], +row["24-06"], +row["24-07"], +row["24-08"],
-      +row["24-09"], +row["24-10"], +row["24-11"], +row["24-12"]
-    ];
-  });
+    data.forEach(row => {
+        stationDataDict[row.station] = [
+            +row["24-01"], +row["24-02"], +row["24-03"], +row["24-04"],
+            +row["24-05"], +row["24-06"], +row["24-07"], +row["24-08"],
+            +row["24-09"], +row["24-10"], +row["24-11"], +row["24-12"]
+        ];
+    });
 
-  // initialize Chart.js 
-  let ctx = document.getElementById('stationData').getContext('2d');
-  // set defult station
-  let defaultStation = Object.keys(stationDataDict)[0] || "Default Station";
-  window.myLineChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
-               "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"],
-      datasets: [{
-        label: ' Avg Response Time : ' + defaultStation,
-        data: stationDataDict[defaultStation],
-        borderColor: 'rgba(214, 88, 159, 1',
-        backgroundColor: 'rgba(214, 88, 159, 0.3)',
-        fill: false,
-        tension: 0.1
-      }]
-    },
-    options: {
-        scales: {
+    // 2.2 initialize Chart.js 
+    let ctx = document.getElementById('stationData').getContext('2d');
+    // set defult station
+    let defaultStation = Object.keys(stationDataDict)[0] || "Default Station";
+    window.myLineChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06","24-07", "24-08", "24-09", "24-10", "24-11", "24-12"],
+            datasets: [{
+            label: ' Avg Response Time : ' + defaultStation + ' Station',
+            data: stationDataDict[defaultStation],
+            borderColor: 'rgba(214, 88, 159, 1',
+            backgroundColor: 'rgba(214, 88, 159, 0.3)',
+            fill: false,
+            tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
                 x: {
                     ticks: { color: "white" },
                     grid: { color: "rgba(255,255,255,0.2)" }
                 },
                 y: {
-                    min: 0,
+                    min: 100,
                     max: 800,
                     ticks: { color: "white" },
                     grid: { color: "rgba(255,255,255,0.2)" }
                 }
             },
-        plugins: {
-            legend: {labels: {color: "white", font: {size: 14}}},
-            annotation: {
-                annotations: {
+            plugins: {
+                legend: {labels: {color: "white", font: {size: 14}}},
+                annotation: {
+                    annotations: {
                         line1: {
                             type: 'line',
                             yMin: 360,
@@ -217,61 +221,60 @@ d3.csv('stations_avg_response.csv').then(data => {
                             }
                         }
                     }
-            },
+                },
+            }
         }
-    }
-})
+    })
 });
 
-// 辅助函数：将十六进制转换为 RGB 数组
+//3. make the color of the lines and firestations distribute according to the time
+// turn the color RGB
 function hexToRgb(hex) {
-  return [
-    parseInt(hex.slice(1, 3), 16),
-    parseInt(hex.slice(3, 5), 16),
-    parseInt(hex.slice(5, 7), 16)
-  ];
+    return [
+        parseInt(hex.slice(1, 3), 16),
+        parseInt(hex.slice(3, 5), 16),
+        parseInt(hex.slice(5, 7), 16)
+    ];
 }
 
-// 辅助函数：将 RGB 数组转换为十六进制字符串
 function rgbToHex(rgb) {
-  return '#' + rgb.map(x => {
-    const hex = x.toString(16);
-    return hex.length === 1 ? '0' + hex : hex;
-  }).join('');
+    return '#' + rgb.map(x => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
 }
 
-// 辅助函数：线性插值，返回在 start 和 end 之间的 RGB 数组
 function interpolateColor(t, start, end) {
-  return [
-    Math.floor(start[0] + (end[0] - start[0]) * t),
-    Math.floor(start[1] + (end[1] - start[1]) * t),
-    Math.floor(start[2] + (end[2] - start[2]) * t)
-  ];
+    return [
+        Math.floor(start[0] + (end[0] - start[0]) * t),
+        Math.floor(start[1] + (end[1] - start[1]) * t),
+        Math.floor(start[2] + (end[2] - start[2]) * t)
+    ];
 }
 
-// 定义响应时间较短和较长时的颜色
-const fastColor = hexToRgb("#C4E4FF"); // 响应快时颜色
-const slowColor = hexToRgb("#D20062"); // 响应慢时颜色
+// 3.1 set the color of the line
+const fastColor = hexToRgb("#C4E4FF"); //fast
+const slowColor = hexToRgb("#D20062"); //slow
 
-// 定义响应时间的最小值和最大值（根据数据调整）
+// max and min time
 const minResponse = 100, maxResponse = 600;
 
-// 根据响应时间计算颜色
+// calculate
 function getColorForResponse(responseTime) {
-  let t = (responseTime - minResponse) / (maxResponse - minResponse);
-  t = Math.max(0, Math.min(t, 1)); // 保证 t 在 0 到 1 之间
-  const rgb = interpolateColor(t, fastColor, slowColor);
-  return rgbToHex(rgb);
+    let t = (responseTime - minResponse) / (maxResponse - minResponse);
+    t = Math.max(0, Math.min(t, 1)); // make sure it's between 0-1
+    const rgb = interpolateColor(t, fastColor, slowColor);
+    return rgbToHex(rgb);
 }
 
-// 全局存储 Marker 引用数组，方便更新颜色
+function getColorByResponseTime(d) {
+    // d.response_time 
+    return hexToRgb(getColorForResponse(d.response_time));
+}
+
+
+// set a dateframe to save the color logic
 let stationMarkers = [];
-
-// 假设 stationDataDict 是全局对象，存储了各消防站每个月的平均响应时间数组
-// 例如：{ "StationA": [120, 130, ...], "StationB": [150, 160, ...], ... }
-
-
-// 假设 selectedMonthIndex 表示当前选中月份的数组索引（0 表示 "24-01"）
 let selectedMonthIndex = 0;
 
 // 加载消防站 CSV 数据，创建 Marker 并根据当前月份设置颜色
@@ -295,10 +298,10 @@ d3.csv('firestation3.csv').then(data => {
 
     // 鼠标进入时更新折线图（此处可保持原有逻辑）
     marker.getElement().addEventListener('mouseenter', () => {
-      console.log("鼠标进入消防站：", stationName);
+      console.log(" mousemovein：", stationName);
       if (stationDataDict[stationName] && window.myLineChart) {
         window.myLineChart.data.datasets[0].data = stationDataDict[stationName];
-        window.myLineChart.data.datasets[0].label = ' Avg Response Time : ' + stationName;
+        window.myLineChart.data.datasets[0].label = ' Avg Response Time : ' + stationName + ' Station';
         window.myLineChart.update();
       }
     });
@@ -312,9 +315,6 @@ document.getElementById('slider').addEventListener('input', function (e) {
   // 更新月份显示标签（假设你的月份数组如下）
   const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
                   "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
-  if (selectedMonthIndex >= 0 && selectedMonthIndex < months.length) {
-    document.getElementById('month-label').innerText = months[selectedMonthIndex];
-  }
 
   // 遍历所有 Marker，根据新的月份重新计算颜色
   stationMarkers.forEach(item => {
@@ -445,109 +445,86 @@ document.getElementById('slider').addEventListener('input', function (e) {
 });
 
 // 4. adding fire acidents time
-let responseGeojsonData = null; // 火灾事件 GeoJSON 数据
-let responseLayer = null;       // 事件点图层（可选）
-let connectionLayer = null;     // 连接线图层（可选）
-let fireStationData = {};       // 消防站数据
+let responseGeojsonData = null; // GeoJSON
+let responseLayer = null;       // points
+let connectionLayer = null;     // lines
+let fireStationData = {};       // station
 let selectedMonth = "24-01";
 
 map.on('load', () => {
-  Promise.all([
-    fetch('station.geojson').then(r => r.json()),
-    fetch('incident_cleaned.geojson').then(r => r.json())
-  ]).then(([firestationGeojson, incidentGeojson]) => {
-    // 处理消防站数据
-    fireStationData = {};
-    firestationGeojson.features.forEach(feature => {
-      let stationName = feature.properties.station;
-      let coordinates = feature.geometry.coordinates;
-      fireStationData[stationName] = coordinates;
+    Promise.all([
+        fetch('station.geojson').then(r => r.json()),
+        fetch('incident_standardized_filtered.geojson').then(r => r.json())
+    ]).then(([firestationGeojson, incidentGeojson]) => {
+        // for stations
+        fireStationData = {};
+        firestationGeojson.features.forEach(feature => {
+            let stationName = feature.properties.station;
+            let coordinates = feature.geometry.coordinates;
+            fireStationData[stationName] = coordinates;
+        });
+
+        // for incidents
+        responseGeojsonData = incidentGeojson;
+
+        // update
+        updateResponseMap(selectedMonth);
     });
-
-    // 处理火灾数据
-    responseGeojsonData = incidentGeojson;
-
-    // 两份数据都加载好后，再调用更新函数
-    updateResponseMap(selectedMonth);
-  });
 });
 
 function updateResponseMap(month) {
     if (!responseGeojsonData || !fireStationData) return;
-  
-    // 根据所选月份过滤火灾数据
+
+    // select the date in months
     let filteredFeatures = responseGeojsonData.features.filter(feature => feature.properties.month === month);
-  
-    // 生成弧线数据，确保每条记录都有有效的起点和终点
+
+    // creat the lines
     let arcsData = filteredFeatures.map(feature => {
-        let stationName = feature.properties.station;
-        let start = fireStationData[stationName];
+        let start = fireStationData[feature.properties.station];
         let end = feature.geometry.coordinates;
-        let responseTime = feature.properties.response_time; // 假设数据中有此字段
+        let responseTime = feature.properties.response_time;
         if (!start || !end) return null;
         return {
             sourcePosition: start,
             targetPosition: end,
-            response_time: responseTime
+            response_time: responseTime,
         };
     }).filter(d => d !== null);
 
-  // 移除旧的 arc-layer（如果存在）
+    // update the layer and clean the old layers
     if (map.getLayer('arc-layer')) {
         map.removeLayer('arc-layer');
     }
-    if (map.getSource('arc-layer')) {
-        map.removeSource('arc-layer');
-    }
 
-    const minTime = 0, maxTime = 1000; // 你可以根据实际数据调整这两个值
+      
 
-    function getColorByResponseTime(d) {
-        let t = (d.response_time - minTime) / (maxTime - minTime);
-        t = Math.max(0, Math.min(t, 1)); // 保证 t 在 0 到 1 之间
-        // 这里我们让 t 越大，红色通道越高，同时绿色和蓝色下降
-        let r = Math.floor(t * 255);
-        let g = Math.floor((1 - t) * 128);
-        let b = Math.floor((1 - t) * 255);
-        return [r, g, b];
-    }
-
-
-  // 创建 deck.gl 的 ArcLayer
-  const arcLayer = new deck.MapboxLayer({
-  id: 'arc-layer',
-  type: deck.ArcLayer,
-  data: arcsData,
-  getSourcePosition: d => d.sourcePosition,
-  getTargetPosition: d => d.targetPosition,
-  getSourceColor: d => getColorByResponseTime(d),
-  getTargetColor: d => getColorByResponseTime(d),
-  getWidth: 2,
-  getHeight: 2
-});
-
-  
-  // 将新图层添加到地图中（放在 'boroughs-outline' 图层之上）
-  map.addLayer(arcLayer, 'boroughs-outline');
+    // add new ArcLayer
+    const arcLayer = new deck.MapboxLayer({
+        id: 'arc-layer',
+        type: deck.ArcLayer,
+        data: arcsData,
+        getSourcePosition: d => d.sourcePosition,
+        getTargetPosition: d => d.targetPosition,
+        getSourceColor: d => getColorByResponseTime(d),
+        getTargetColor: d => getColorByResponseTime(d),
+        getWidth: 1
+    });
+    map.addLayer(arcLayer);
 }
 
 updateResponseMap(selectedMonth)
 connectionLayer = "connections"; 
 
-// 1️⃣ 加载 Borough 数据
-
-
-
-// 5️⃣ listen to slider to update
+// listen to slider to update
 document.getElementById('slider').addEventListener('input', function (e) {
-    const selectedIndex = parseInt(e.target.value, 10);
-    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06",
-                    "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
-
-    if (selectedIndex >= 0 && selectedIndex < months.length) {
-        selectedMonth = months[selectedIndex];
+    selectedMonthIndex = parseInt(e.target.value, 10);
+    const months = ["24-01", "24-02", "24-03", "24-04", "24-05", "24-06", "24-07", "24-08", "24-09", "24-10", "24-11", "24-12"];
+    if (selectedMonthIndex >= 0 && selectedMonthIndex < months.length) {
+        selectedMonth = months[selectedMonthIndex];
         document.getElementById('month-label').innerText = selectedMonth;
-        updateResponseMap(selectedMonth); // 更新地图数据
+
+        // update the line layer
+        updateResponseMap(selectedMonth);
     }
 });
 
