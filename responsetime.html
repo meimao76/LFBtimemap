@@ -13,6 +13,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>  <!-- D3 -->
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.2.0"></script>
+
 
     <!-- CSS & JS -->
     <link rel="stylesheet" href="styles_avg.css">
@@ -26,12 +28,13 @@
 <!-- 1.map container-->
 <div id="map"></div>
 
+<!-- 2. page top -->
 <div class="nav-buttons">
     <button id="show-home-page">Home Page</button>
     <button id="show-fire-map">Fire Incidents Map</button>
 </div>
 
-<!-- 2.information on top of map-->
+<!-- 3.information on top of map-->
 <div class="map-overlay top">
     <!-- 3.1 slider -->
     <div class="map-overlay-inner">
@@ -71,7 +74,35 @@
     <div id="linechart" class="chart-container">
         <canvas id="boroughLineChart"></canvas>
     </div>  
+    <!-- 3.4 legend-->
+    <div id="gradient-legend" class="legend">
+        <h3>Average Response Time (s)</h3>
+        <div class="gradient-bar"></div>
+        <div class="legend-labels">
+            <span>250</span>
+            <span>300</span>
+            <span>350</span>
+            <span>400+</span>
+        </div>
+    </div>
 </div>
+
+<!-- 4. description -->
+<div id="sidebar">
+    <div id="sidebar-header">
+        <h2>About this map: </h2>
+        <button id="toggle-sidebar">➡</button>
+    </div>
+    <div id="sidebar-content">
+        <p>This page shows the spatial distribution of London fire response times in 2024. <br>
+        <br>
+        You can use the slider to select the month and see the average response time for different areas.
+        Move the mouse over an area on the map to see specific response time trends in the line chart. <br>
+        <br>
+        The international standard fire response time is 360s, here you can compare which areas are out of limit in the line chart.</p>
+    </div>
+</div>
+
 
     
 <script>
@@ -85,6 +116,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+document.getElementById("toggle-sidebar").addEventListener("click", function () {
+    let sidebar = document.getElementById("sidebar");
+    let button = document.getElementById("toggle-sidebar");
+
+    if (sidebar.classList.contains("collapsed")) {
+        sidebar.classList.remove("collapsed");
+        button.innerText = "➡"; // right, show out
+    } else {
+        sidebar.classList.add("collapsed");
+        button.innerText = "⬅"; // left, hide 
+    }
+});
+
+
+
 // 1. basic map
 mapboxgl.accessToken = 'pk.eyJ1IjoiY3N5LWNmIiwiYSI6ImNtN3AwMGNwcDBiZ2QyanF5MjY3enNjYmUifQ.PtjSbRT97fZ1jfmVSdJ7gw';         
 var map = new mapboxgl.Map({
@@ -93,6 +139,11 @@ var map = new mapboxgl.Map({
     center: [-0.1, 51.5], 
     zoom: 12
 });
+
+map.addControl(new mapboxgl.ScaleControl({
+    maxWidth: 200, 
+    unit: 'metric' // unit
+}));
 
 // 2. adding fire station points
 const tooltip = new mapboxgl.Popup({
@@ -287,10 +338,10 @@ function updateLineChart(boroughName) {
     }
 
     let ctx = document.getElementById('boroughLineChart').getContext('2d');
-    boroughLineChart = new Chart(ctx, {
-        type: 'line',
-        data: {labels: months,
-            datasets: [{
+boroughLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {labels: months,
+        datasets: [{
             label: `Average Response Time(s) - ${boroughName}`,
             data: responseTimeValues,
             borderColor: 'rgba(255, 158, 121, 1)',
@@ -299,31 +350,52 @@ function updateLineChart(boroughName) {
             fill: true,
             pointRadius: 5,
             pointBackgroundColor: 'rgba(255, 158, 121, 1)'
-            }]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    labels: {
-                        color: "white", // ✅ 将图例文字改为白色
-                        font: {size: 14} // ✅ 适当增大字体，提高可读性
-                    }
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: {
+                    color: "white",
+                    font: {size: 14}
                 }
             },
-            scales: {
-                x: {
-                    ticks: { color: "white" },
-                    grid: { color: "rgba(255,255,255,0.2)" }
-                },
-                y: {
-                    min: 150,
-                    max: 450,
-                    ticks: { color: "white" },
-                    grid: { color: "rgba(255,255,255,0.2)" }
+            annotation: {
+                annotations: {
+                    line1: {
+                        type: 'line',
+                        yMin: 360,
+                        yMax: 360,
+                        borderColor: 'white',
+                        borderWidth: 1,
+                        borderDash: [5, 5], // turn into dash line
+                        label: {
+                            content: '360s',
+                            enabled: true,
+                            position: 'start',
+                            backgroundColor: 'rgba(0,0,0,0.4)',
+                            color: 'white',
+                            font: { size: 8 }
+                        }
+                    }
                 }
             }
+        },
+        scales: {
+            x: {
+                ticks: { color: "white" },
+                grid: { color: "rgba(255,255,255,0.2)" }
+            },
+            y: {
+                min: 150,
+                max: 450,
+                ticks: { color: "white" },
+                grid: { color: "rgba(255,255,255,0.2)" }
+            }
         }
-    });
+    }
+});
+
 };
 
 
