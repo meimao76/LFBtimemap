@@ -101,13 +101,13 @@
     });
         
 
-let geojsonData = null;  // 存储 `GeoJSON` 数据，确保 updateMap() 可以使用
+let geojsonData = null;  
 
 map.on('load', function () {
     fetch('boroughs_merged.geojson')
         .then(response => response.json())
         .then(geojson => {
-            geojsonData = geojson; // 存储数据，后续滑动条可以用
+            geojsonData = geojson; 
             map.addSource('boroughs', { 'type': 'geojson', 'data': geojson });
 
             map.addLayer({
@@ -132,14 +132,12 @@ map.on('load', function () {
         .catch(error => console.error("Error loading borough data:", error));
 });
 
-// **🔹 修正 updateMap()，确保滑块变动时数据正确更新**
+
 function updateMap(month) {
     if (!map.getLayer('boroughs-layer') || !geojsonData) {
         console.warn("Map layer or data not ready yet!");
         return;
     }
-
-    console.log("Updating map for:", month);  // 调试信息
 
     map.setPaintProperty('boroughs-layer', 'fill-color', [
         'case',
@@ -153,7 +151,7 @@ function updateMap(month) {
     ]);
 }
 
-// **🔹 监听滑动条的值变化**
+// listen to slider
 document.getElementById('slider').addEventListener('input', function (e) {
     const selectedIndex = e.target.value;
     const months = [
@@ -165,7 +163,7 @@ document.getElementById('slider').addEventListener('input', function (e) {
     updateMap(selectedMonth);
 });
 
-        </script>
+</script>
         
         
 </body>
